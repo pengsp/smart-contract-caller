@@ -15,7 +15,10 @@
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.1",
+    "@web3-react/core": "^8.2.3",
+    "@web3-react/metamask": "^8.2.4",
     "antd": "^5.20.6",
+    "eventemitter3": "^5.0.1",
     "next": "14.2.9",
     "react": "^18",
     "react-dom": "^18"
