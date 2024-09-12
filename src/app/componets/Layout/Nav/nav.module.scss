@@ -1,0 +1,32 @@
+.modal_root {
+    @apply w-[600px];
+
+    .networks_wrap {
+        @apply grid grid-cols-2 gap-4;
+    }
+
+    .network_item {
+        @apply flex gap-3 border relative p-2 px-3 items-center rounded cursor-pointer;
+
+        &:hover {
+            @apply bg-blue-100 border-blue-300;
+        }
+
+        .chain_id {
+            @apply text-gray-500;
+        }
+    }
+
+    .network_current_item {
+        @extend .network_item;
+        @apply border-blue-500 bg-blue-100;
+
+        &:hover {
+            @apply border-blue-500 bg-blue-100;
+        }
+    }
+
+    .current_tag {
+        @apply absolute right-0 top-1 text-xs;
+    }
+}

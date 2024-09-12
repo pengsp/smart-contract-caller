@@ -14,10 +14,12 @@
     }
   },
   "dependencies": {
+    "@ant-design/cssinjs": "^1.21.1",
     "@ant-design/nextjs-registry": "^1.0.1",
     "@web3-react/core": "^8.2.3",
     "@web3-react/metamask": "^8.2.4",
     "antd": "^5.20.6",
+    "ethers": "^6.13.2",
     "eventemitter3": "^5.0.1",
     "next": "14.2.9",
     "react": "^18",
@@ -27,11 +29,13 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.20",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.9",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
+    "postcss": "^8.4.45",
+    "sass": "^1.78.0",
+    "tailwindcss": "^3.4.11",
     "typescript": "^5"
   }
 }

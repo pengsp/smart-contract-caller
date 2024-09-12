@@ -1,0 +1,31 @@
+.root {
+    .list {
+        @apply flex flex-col;
+
+        .item {
+            @apply bg-gray-50 h-24 p-3 cursor-pointer transition-colors;
+
+            &:hover {
+                @apply bg-[--base-blue-50] text-white transition-colors;
+            }
+
+            &_current {
+                @extend .item;
+                @apply bg-[--base-blue] text-white transition-colors relative -right-[1px];
+            }
+
+            .name {
+                @apply font-bold;
+            }
+
+            .address {
+                @apply text-sm;
+            }
+
+            .chainInfo {
+                @apply text-sm;
+            }
+        }
+
+    }
+}
