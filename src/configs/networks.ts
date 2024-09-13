@@ -1,5 +1,5 @@
 export interface Network {
-  chainId: number | string,
+  chainId: string, // A 0x-prefixed hexadecimal chainId
   chainName: string,
   nativeCurrency: {
     name: string,

@@ -11,6 +11,7 @@ import { truncateAddress } from "@/utils";
 import { Network, networks } from "@/configs";
 import Image from "next/image";
 import classes from "./nav.module.scss"
+import NetworkItem from "../../NetworkItem";
 export default function Nav() {
     const { connect, disconnect } = useAuth()
     const { account, chainId, connector } = useWeb3React()
@@ -93,15 +94,9 @@ export default function Nav() {
                 <div className="my-4">请在下方列表中选择需要切换的网络</div>
 
                 <div className={classes.networks_wrap}>
-                    {networks.map((network: Network, index: number) => {
-                        return <div key={index} className={Number(network.chainId) !== Number(chainId) ? classes.network_item : classes.network_current_item} onClick={() => switchNetwork(network)}>
-                            {(network.iconUrls && network.iconUrls[0])
-                                ? <Image src={network?.iconUrls[0]} width={30} height={30} style={{ maxHeight: "30px" }} alt={network.chainName} />
-                                : <Image src="/images/other.svg" width={20} height={20} alt={network.chainName} />}
-                            <div>
-                                <div>{network.chainName}</div>
-                                <div className={classes.chain_id}>Chain Id: {Number(network.chainId)}</div>
-                            </div>
+                    {networks.map((network: Network) => {
+                        return <div onClick={() => switchNetwork(network)} key={network.chainId} >
+                            <NetworkItem network={network} selected={Number(network.chainId) == Number(chainId)} />
                         </div>
                     })}
                 </div >

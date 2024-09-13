@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@ant-design/cssinjs": "^1.21.1",
+    "@ant-design/icons": "^5.4.0",
     "@ant-design/nextjs-registry": "^1.0.1",
     "@web3-react/core": "^8.2.3",
     "@web3-react/metamask": "^8.2.4",
