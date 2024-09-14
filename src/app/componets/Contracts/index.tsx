@@ -1,9 +1,8 @@
 "use client"
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import List from 'rc-virtual-list';
-import { Button, Tabs } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Button } from "antd";
+import { PlusOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import { useLocalStorageState } from 'ahooks';
 import classes from "./contracts.module.scss"
 import ContractEditor, { ContractEditorRef } from "./ContractEditor";
@@ -37,11 +36,14 @@ export default function Contracts() {
         <>
             <div className={classes.root}>
                 <div className="flex items-center justify-between p-4 py-8 ">
-                    <div className="font-bold text-blue-400">合约列表</div>
+                    <div className="flex gap-2 items-center ">
+                        <UnorderedListOutlined />
+                        <span>合约列表</span>
+                    </div>
                     <Button icon={<PlusOutlined />} onClick={() => actionAddContract()}>增加合约</Button>
                 </div>
-
                 <div className={classes.list}>
+
                     {
                         contracts?.map((contract: Contract) => {
                             return <div className={inTestContract && inTestContract.hash == contract.hash ? classes.item_current : classes.item} key={contract.hash} onClick={() => actionTestContract(contract)}>

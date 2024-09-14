@@ -1,9 +1,9 @@
 .root {
     .list {
-        @apply flex flex-col gap-4 h-[700px] overflow-y-auto overflow-x-hidden;
+        @apply bg-gray-100 pt-4 h-[calc(100vh-224px)] overflow-y-scroll;
 
         .item {
-            @apply p-4 transition-colors border mx-4 bg-gray-50 rounded cursor-pointer;
+            @apply p-4 transition-colors border mx-4 bg-gray-50 rounded cursor-pointer mb-4;
 
             &:hover {
                 // @apply bg-[--base-blue-50] border-[--base-blue-50] text-white transition-colors;
@@ -11,7 +11,7 @@
 
             &_current {
                 @extend .item;
-                @apply transition-colors relative -right-[1px] mr-0 border-r-0 rounded-e-none cursor-default;
+                @apply transition-colors cursor-default bg-blue-400 border-blue-400 text-white;
 
 
 
@@ -26,7 +26,7 @@
             }
 
             .chainInfo {
-                @apply text-sm flex gap-2 mt-1 pt-2;
+                @apply text-sm flex gap-2 mt-1 pt-2 text-gray-600;
             }
         }
 

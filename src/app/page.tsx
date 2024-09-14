@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <>
       <Nav />
-      <div className="flex h-[100vh]">
+      <div className="flex h-[calc(100vh-112px)]">
         <div className="w-[420px] ">
           {/* <Connection /> */}
           <Contracts />
