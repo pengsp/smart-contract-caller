@@ -43,7 +43,6 @@ export default function Contracts() {
                     <Button icon={<PlusOutlined />} onClick={() => actionAddContract()}>增加合约</Button>
                 </div>
                 <div className={classes.list}>
-
                     {
                         contracts?.map((contract: Contract) => {
                             return <div className={inTestContract && inTestContract.hash == contract.hash ? classes.item_current : classes.item} key={contract.hash} onClick={() => actionTestContract(contract)}>
@@ -58,7 +57,6 @@ export default function Contracts() {
                         })
                     }
                 </div>
-
             </div>
             <ContractEditor ref={contractEditorRef} />
         </>
@@ -68,19 +66,11 @@ export default function Contracts() {
 function getChainByChainId(chainId: string) {
     const network = networks.find(network => network.chainId == chainId)
     if (network) {
-        return <a key={network.chainId} onClick={(e) => e.stopPropagation()} className="flex justify-center border py-1 px-2 rounded gap-1 relative bg-gray-100" href={`${network.blockExplorerUrls[0]}`} target="_blank" title={`在${network.chainName}区块浏览器查看`}>
-
+        return <div key={network.chainId} className="flex justify-center border py-1 px-2 rounded gap-1 relative bg-gray-100" >
             {network?.iconUrls && network?.iconUrls?.length > 0
-                ? <Image src={network.iconUrls[0]} width={20} height={20} alt={`在${network.chainName}区块浏览器查看`} />
-                : <Image src="/images/other.svg" width={20} height={20} alt={`在${network.chainName}区块浏览器查看`} />}
+                ? <Image src={network.iconUrls[0]} width={20} height={20} alt={`${network.chainName}`} />
+                : <Image src="/images/other.svg" width={20} height={20} alt={`${network.chainName}`} />}
             <span className="">{Number(network.chainId)}</span>
-        </a>
+        </div>
     }
-}
-function ExplorerLinks({ chainIds }: { chainIds: string[] }) {
-    return (<>
-        {chainIds.map(chainId => {
-            return getChainByChainId(chainId)
-        })}
-    </>)
 }
