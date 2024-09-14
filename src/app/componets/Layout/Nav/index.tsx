@@ -8,10 +8,11 @@ import type { MenuProps } from 'antd';
 
 import { ApiOutlined, DownOutlined, GlobalOutlined, SwapOutlined } from '@ant-design/icons';
 import { truncateAddress } from "@/utils";
-import { Network, networks } from "@/configs";
+import { networks } from "@/configs";
 import Image from "next/image";
 import classes from "./nav.module.scss"
 import NetworkItem from "../../NetworkItem";
+import { Network } from "@/types";
 export default function Nav() {
     const { connect, disconnect } = useAuth()
     const { account, chainId, connector } = useWeb3React()
@@ -72,7 +73,7 @@ export default function Nav() {
         },
     ];
     return (<>
-        <div className=" sticky top-0 left-0 right-0 p-6  border-b">
+        <div className=" sticky top-0 left-0 right-0 p-6  border-b bg-white z-10">
             <div className="flex justify-between items-center">
                 <div>
                     <div className="text-2xl">智能合约调试工具</div>

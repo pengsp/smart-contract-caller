@@ -13,7 +13,7 @@ export default function Home() {
           <Contracts />
 
         </div>
-        <div className="grow border-l border-gray-200"></div>
+        <div className="grow border-l border-gray-200 bg-gray-50"></div>
       </div>
     </>
   );

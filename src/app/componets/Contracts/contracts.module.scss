@@ -1,21 +1,19 @@
 .root {
     .list {
-        @apply flex flex-col gap-2 bg-gray-50;
+        @apply flex flex-col gap-4 h-[700px] overflow-y-auto overflow-x-hidden;
 
         .item {
-            @apply h-24 p-4 cursor-pointer transition-colors;
+            @apply p-4 transition-colors border mx-4 bg-gray-50 rounded cursor-pointer;
 
             &:hover {
-                @apply bg-[--base-blue-50] text-white transition-colors;
+                // @apply bg-[--base-blue-50] border-[--base-blue-50] text-white transition-colors;
             }
 
             &_current {
                 @extend .item;
-                @apply bg-[--base-blue] text-white transition-colors relative -right-[1px];
+                @apply transition-colors relative -right-[1px] mr-0 border-r-0 rounded-e-none cursor-default;
 
-                &:hover {
-                    @apply bg-[--base-blue] text-white transition-colors;
-                }
+
 
             }
 
@@ -28,7 +26,7 @@
             }
 
             .chainInfo {
-                @apply text-sm;
+                @apply text-sm flex gap-2 mt-1 pt-2;
             }
         }
 
