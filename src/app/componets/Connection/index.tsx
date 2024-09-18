@@ -12,13 +12,14 @@ import { Network } from "@/types";
 import { networks } from "@/configs";
 import NetworkItem from "../NetworkItem";
 import classes from "./connection.module.scss"
+import ConnectWalletBtn from "./ConnectWalletBtn";
 
 export default function Connection() {
     const [isLogin, setIsLogin] = useState(false)
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [networkChanging, setNetworkChanging] = useState(false)
-    const { connect, disconnect } = useAuth()
+    const { disconnect } = useAuth()
     const { account, chainId, connector } = useWeb3React()
 
     const showModal = () => {
@@ -30,9 +31,6 @@ export default function Connection() {
         setIsModalOpen(false);
         setNetworkChanging(false)
     };
-    const login = useCallback(async () => {
-        await connect();
-    }, [connector])
     const switchNetwork = useCallback(async (network: Network) => {
         if (connector) {
             setNetworkChanging(true)
@@ -81,7 +79,7 @@ export default function Connection() {
                     <Button type="primary" icon={<DownOutlined />} iconPosition="end">{truncateAddress(account)}</Button>
                 </Dropdown>
             </div>
-            : <Button onClick={login}>Connect MetaMask</Button>}
+            : <ConnectWalletBtn />}
         <Modal title="选择网络" open={isModalOpen} onCancel={handleCancel} className={classes.modal_root} width={600} footer={null} maskClosable={false}>
             <Spin spinning={networkChanging} tip={<div className=" text-xl mt-7 font-bold">请在MetaMask中确认网络切换请求...</div>} size="large">
                 <div className="my-4">请在下方列表中选择需要切换的网络</div>

@@ -112,7 +112,7 @@ const ContractEditor = forwardRef(function ContractEditor(props, ref) {
         {contextHolder}
         <Modal title={contractHash ? "编辑合约" : "新增合约"} open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={null} maskClosable={false} width={800}>
             <Form
-                name="basic"
+                name={contractHash ? 'edit_form' : 'add_form'}
                 autoComplete="off"
                 layout="vertical"
                 initialValues={initialValues}

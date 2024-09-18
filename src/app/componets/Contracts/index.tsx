@@ -1,19 +1,19 @@
 "use client"
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Button } from "antd";
-import { PlusOutlined, UnorderedListOutlined } from "@ant-design/icons";
+import { Badge, Button } from "antd";
+import { PlusOutlined, ProfileOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import { useLocalStorageState } from 'ahooks';
 import classes from "./contracts.module.scss"
 import ContractEditor, { ContractEditorRef } from "./ContractEditor";
 import { Contract } from "@/types";
-import { LocalStorageContracts } from "@/constants";
+import { LocalStorageContracts, LocalStorageCurrentContract } from "@/constants";
 import { networks } from "@/configs";
 
 export default function Contracts() {
     const contractEditorRef = useRef<ContractEditorRef>(null)
     const [contracts, setContracts] = useState<Contract[] | undefined>()
-    const [inTestContract, setInTestContract] = useState<Contract | null>(null)
+    const [currentContractHash, setCurrentContractHash] = useState<string | undefined | null>(null)
     const [localContracts, setLocalContracts] = useLocalStorageState<Contract[]>(
         LocalStorageContracts,
         {
@@ -21,31 +21,46 @@ export default function Contracts() {
             listenStorageChange: true
         },
     );
-    const actionAddContract = (contract?: Contract) => {
-        contractEditorRef?.current?.showContractEditor(contract)
-    };
-    const actionTestContract = (contract: Contract) => {
-        setInTestContract(contract)
+    const [defaultContract, setDefaultContract] = useLocalStorageState<string | undefined | null>(
+        LocalStorageCurrentContract,
+        {
+            defaultValue: '',
+            // listenStorageChange: true
+        },
+    );
+
+    const actionAddContract = () => {
+        contractEditorRef?.current?.showContractEditor()
     };
 
+    const selectContract = (hash: string) => {
+        setCurrentContractHash(hash)
+        setDefaultContract(hash)
+    }
     useEffect(() => {
         // fix hydration error
         setContracts(localContracts)
     }, [localContracts])
+
+    useEffect(() => {
+        setCurrentContractHash(defaultContract)
+    }, [defaultContract])
     return (
         <>
             <div className={classes.root}>
                 <div className="flex items-center justify-between p-4 py-8 ">
-                    <div className="flex gap-2 items-center ">
+                    <div className="flex gap-1 items-center ">
                         <UnorderedListOutlined />
-                        <span>合约列表</span>
+                        <span>合约列表 [{contracts && contracts.length}]</span>
                     </div>
                     <Button icon={<PlusOutlined />} onClick={() => actionAddContract()}>增加合约</Button>
                 </div>
                 <div className={classes.list}>
                     {
-                        contracts?.map((contract: Contract) => {
-                            return <div className={inTestContract && inTestContract.hash == contract.hash ? classes.item_current : classes.item} key={contract.hash} onClick={() => actionTestContract(contract)}>
+                        contracts?.map((contract: Contract, index: number) => {
+                            return <div className={currentContractHash && currentContractHash == contract.hash ? classes.item_current : classes.item}
+                                key={contract.hash}
+                                onClick={() => selectContract(contract.hash)}>
                                 <div className={classes.name}>{contract.name}</div>
                                 <div className={classes.address}>{contract.address}</div>
                                 <div className={classes.chainInfo}>
@@ -53,6 +68,7 @@ export default function Contracts() {
                                         return getChainByChainId(chainId)
                                     })}
                                 </div>
+                                <div className={classes.index}>{index + 1}</div>
                             </div>
                         })
                     }
