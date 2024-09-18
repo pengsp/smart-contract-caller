@@ -3,7 +3,6 @@ import { useMemo } from "react";
 import { getContract } from "../utils";
 import { useWeb3React } from "@web3-react/core";
 
-// returns null on errors
 export function useContract(
   address: string | undefined,
   ABI: any,

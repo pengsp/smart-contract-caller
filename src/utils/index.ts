@@ -1,2 +1,2 @@
 export * from './blockChain'
-export * from './truncateAddress'
+export * from './numberHandler'

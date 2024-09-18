@@ -21,3 +21,29 @@ export const truncateAddress = (str?: string, config?: TruncateAddressConfig): s
   return str ? `${str.substring(frontBeginIndex, frontBeginIndex + frontLength)}${connectSymbol}${str.substring(str.length - endingLength)}` : '-'
 }
 
+
+// 千分位标记
+export function commify(value: any) {
+
+  if (value < 1000) {
+    return Number(value)
+  }
+  const valueStr = value.toString()
+  const match = valueStr.match(/^(-?)([0-9]*)(\.?)([0-9]*)$/);
+  if (!match || (!match[2] && !match[4])) {
+    throw new Error(`bad formatted number: ${JSON.stringify(value)}`);
+  }
+  const neg = match[1];
+  const whole = BigInt(match[2] || 0).toLocaleString("en-us");
+  const frac = match[4] ? match[4].match(/^(.*?)0*$/)[1] : "";
+  if (frac) {
+    return `${neg}${whole}.${frac}`;
+  } else {
+    return `${neg}${whole}`;
+  }
+}
+
+export const toHex = (num: number) => {
+  const val = Number(num);
+  return "0x" + val.toString(16);
+};
