@@ -21,17 +21,17 @@ export default function ContractList({ add }: { add: () => void }) {
             listenStorageChange: true
         },
     );
-    const [defaultContract, setDefaultContract] = useLocalStorageState<string | undefined | null>(
+    const [defaultContractHash, setDefaultContractHash] = useLocalStorageState<string | undefined | null>(
         LocalStorageCurrentContract,
         {
             defaultValue: '',
-            // listenStorageChange: true
+            listenStorageChange: true
         },
     );
 
     const selectContract = (hash: string) => {
         setCurrentContractHash(hash)
-        setDefaultContract(hash)
+        setDefaultContractHash(hash)
     }
     useEffect(() => {
         // fix hydration error
@@ -40,8 +40,8 @@ export default function ContractList({ add }: { add: () => void }) {
     }, [localContracts])
 
     useEffect(() => {
-        setCurrentContractHash(defaultContract)
-    }, [defaultContract])
+        setCurrentContractHash(defaultContractHash || null)
+    }, [defaultContractHash])
 
     const onChange = (value: string) => {
         console.log(`selected ${value}`);

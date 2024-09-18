@@ -74,7 +74,9 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
                 key: 'address',
                 label: '合约地址',
                 span: 2,
-                children: pageLoading ? <div className="w-48"><Skeleton.Button active block size="small" /></div> : <Paragraph copyable={{ text: address }} className="!mb-0">{address}</Paragraph>,
+                children: pageLoading
+                    ? <div className="w-48"><Skeleton.Button active block size="small" /></div>
+                    : (address ? <Paragraph copyable={{ text: address }} className="!mb-0">{address}</Paragraph> : '-'),
             },
             // {
             //     key: 'timestamp',
@@ -90,15 +92,15 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
                 key: 'action',
                 label: '操作',
                 children: <div className="flex gap-2">
-                    <Button size="small" onClick={actionEditContract} icon={<EyeOutlined />} disabled={pageLoading}>查看ABI</Button>
-                    <Button size="small" onClick={actionEditContract} icon={<EditOutlined />} disabled={pageLoading}>编辑</Button>
+                    <Button size="small" onClick={actionEditContract} icon={<EyeOutlined />} disabled={pageLoading || currentContractHash == ''}>查看ABI</Button>
+                    <Button size="small" onClick={actionEditContract} icon={<EditOutlined />} disabled={pageLoading || currentContractHash == ''}>编辑</Button>
                     <Popconfirm
                         title="删除合约"
                         description="确定删除这个合约?"
                         onConfirm={() => actionDeleteContract(contract?.hash)}
                         okText="确定"
                         cancelText="取消"
-                    >    <Button danger size="small" icon={<DeleteOutlined />} disabled={pageLoading} >删除</Button>
+                    >    <Button danger size="small" icon={<DeleteOutlined />} disabled={pageLoading || currentContractHash == ''} >删除</Button>
                     </Popconfirm>
 
                 </div>,

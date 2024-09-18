@@ -102,7 +102,7 @@ const ContractEditor = forwardRef(function ContractEditor(props, ref) {
             setContracts(newContracts)
         } else {
             const hash = hashMessage(`${timestamp}`)
-            _contracts.push({ ...contractInfo, hash })
+            _contracts.unshift({ ...contractInfo, hash })
             setContracts(_contracts)
         }
         addContractCallback()
