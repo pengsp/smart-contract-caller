@@ -6,8 +6,10 @@ import { useCallback, useEffect, useState } from "react";
 import Functions from "./components/Functions";
 import Caller from "./components/Caller";
 import Logs from "./components/Logs";
+import { Spin } from "antd";
 
 export default function OperationPanel() {
+    const [pageLoading, setPageLoading] = useState(true)
     const [localContracts, setLocalContracts] = useLocalStorageState<Contract[]>(
         LocalStorageContracts,
         {
@@ -40,21 +42,19 @@ export default function OperationPanel() {
     const clearLogs = () => {
         setLogs([])
     }
-    return (<div className="border  p-4 mt-4 rounded bg-white grow flex flex-col">
-        <div className="border-l-2  pl-2 mb-4">操作面板</div>
-        {contract
-            ? <div className="flex gap-4 grow">
-                <Functions contract={contract} select={(functionItem) => setCurrentFunction(functionItem)} />
-                <div className="grow flex flex-col gap-4">
-                    <div className="grow">
-                        <Logs logs={logs} />
-                    </div>
+    return (<>
+        <div className="flex gap-4 h-full overflow-hidden">
+            <Functions contract={contract} select={(functionItem) => setCurrentFunction(functionItem)} />
+            <div className="grow flex flex-col gap-4">
+                <div className="basis-1/2">
+                    <Logs logs={logs} />
+                </div>
+                <div className="basis-1/2">
                     <Caller contract={contract} functionInfo={currentFunction} updateLogs={() => { }} />
-
                 </div>
             </div>
-            : "暂无数据"}
-    </div>)
+        </div>
+    </>)
 }
 
 

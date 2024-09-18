@@ -1,18 +1,20 @@
-import { Button, Card, Form, Input } from "antd"
+import { Button, Empty, Form, Input } from "antd"
 import { useCallback, useEffect, useState } from "react"
 import ConnectWalletBtn from "../../Connection/ConnectWalletBtn"
 import { useWeb3React } from "@web3-react/core"
 import { useContract } from "@/hooks/useContract"
 import InfoItem from "./InfoItem"
 import ParamsItem from "./ParamsItem"
+import Card from "../../Layout/Card"
+import { defaultContract } from "@/constants"
 
 export default function Caller({ contract, functionInfo, updateLogs }: {
-    contract: Record<string, any>,
+    contract: Record<string, any> | null,
     functionInfo: Record<string, any> | null | undefined,
     updateLogs: (log: any) => void
 }) {
     const { account, chainId, connector } = useWeb3React()
-    const { abi, name, hash, address } = contract;
+    const { abi, name, hash, address } = contract || defaultContract;
     const [callFunctionData, setCallFunctionData] = useState<any>()
     const [callInputs, setCallInputs] = useState<any[]>([])
     const [isLogined, setIsLogined] = useState(false)
@@ -88,82 +90,86 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
         }
     }, [contractInstance, functionInfo, callInputs])
     return (
-        <Card title={functionInfo && <div className="font-bold text-lg">
+        <Card title={functionInfo && <div className="font-bold text-lg font-mono">
             <span className="text-red-800">{functionInfo?.name}</span>
             <span className="text-blue-800">(</span>
             <span className="text-orange-400">{functionInfo.inputs?.map((input: Record<string, any>) => input.name).join(', ')}</span>
             <span className="text-blue-800">)</span>
         </div>
-        }>
-            {functionInfo ?
-                <>
-                    <div className="flex gap-4">
-                        <div className="bg-gray-50 p-4 px-6">
-                            <InfoItem name="Name" value={functionInfo?.name} />
-                            <InfoItem name="State Mutability" value={functionInfo?.stateMutability} />
-                            {functionInfo?.inputs.length > 0 && <ParamsItem type="inputs" params={functionInfo?.inputs} />}
-                            {functionInfo?.outputs.length > 0 && <ParamsItem type="outputs" params={functionInfo?.outputs} />}
+        } >
+            <div className="py-4 font-mono">
+                {functionInfo ?
+                    <>
+                        <div className="flex gap-4">
+                            <div className="bg-gray-50 p-4 px-6">
+                                <InfoItem name="Name" value={functionInfo?.name} />
+                                <InfoItem name="State Mutability" value={functionInfo?.stateMutability} />
+                                {functionInfo?.inputs.length > 0 && <ParamsItem type="inputs" params={functionInfo?.inputs} />}
+                                {functionInfo?.outputs.length > 0 && <ParamsItem type="outputs" params={functionInfo?.outputs} />}
 
-                        </div>
-                        <div className="flex flex-col justify-center bg-gray-50 p-4 px-6 min-w-[400px]">
-                            <Form
-                                name="basic"
-                                autoComplete="off"
-                                layout="vertical"
-                                colon
-                            >
-                                {functionInfo?.stateMutability === "payable" &&
-                                    <Form.Item
-                                        label="数量"
-                                        name="eth"
-                                        className="!mb-2">
-                                        <Input
-                                            placeholder={`请输入ETH数量`}
-                                            key={functionInfo.name}
-                                            value={callFunctionData}
-                                            allowClear
-                                            onChange={(event: any) => {
-                                                const input = event.currentTarget.value
-                                                setCallFunctionData(input)
-                                            }
-                                            }
-                                        />
-                                    </Form.Item>}
+                            </div>
+                            <div className="flex flex-col justify-center bg-gray-50 p-4 px-6 grow">
+                                <Form
+                                    name="basic"
+                                    autoComplete="off"
+                                    layout="vertical"
+                                    colon
+                                    style={{ maxWidth: "500px" }}
+                                >
+                                    {functionInfo?.stateMutability === "payable" &&
+                                        <Form.Item
+                                            label="数量"
+                                            name="eth"
+                                            className="!mb-2">
+                                            <Input
+                                                placeholder={`请输入ETH数量`}
+                                                key={functionInfo.name}
+                                                value={callFunctionData}
+                                                allowClear
+                                                onChange={(event: any) => {
+                                                    const input = event.currentTarget.value
+                                                    setCallFunctionData(input)
+                                                }
+                                                }
+                                            />
+                                        </Form.Item>}
 
-                                {params.map((input: any, index: number) => {
-                                    return <Form.Item
-                                        label={input.name || input.internalType}
-                                        name={input.name}
-                                        key={input.name}
-                                        className="!mb-2">
-                                        <Input
+                                    {params.map((input: any, index: number) => {
+                                        return <Form.Item
+                                            label={input.name || input.internalType}
+                                            name={input.name}
                                             key={input.name}
-                                            placeholder={input.type}
-                                            allowClear
-                                            value={callInputs[index] ? callInputs[index] : ''}
-                                            onChange={(event: any) => {
-                                                const input = event.currentTarget.value
-                                                callInputs[index] = input
-                                                setCallInputs([...callInputs])
-                                            }
-                                            }
-                                        />
+                                            className="!mb-2">
+                                            <Input
+                                                key={input.name}
+                                                placeholder={input.type}
+                                                allowClear
+                                                value={callInputs[index] ? callInputs[index] : ''}
+                                                onChange={(event: any) => {
+                                                    const input = event.currentTarget.value
+                                                    callInputs[index] = input
+                                                    setCallInputs([...callInputs])
+                                                }
+                                                }
+                                            />
+                                        </Form.Item>
+                                    }
+                                    )}
+                                    <Form.Item label="" className="!mb-2">
+                                        <div className="pt-4">
+                                            {isLogined
+                                                ? <Button onClick={callFunction} type="primary" loading={loading} block >
+                                                    {functionInfo.stateMutability == 'view' ? `查询 ${functionInfo?.name}` : "提交"}
+                                                </Button>
+                                                : <ConnectWalletBtn danger block />}
+                                        </div>
                                     </Form.Item>
-                                }
-                                )}
-
-                            </Form>
-                            <div className="mt-3">
-                                {isLogined
-                                    ? <Button onClick={callFunction} type="primary" loading={loading} block >
-                                        {functionInfo.stateMutability == 'view' ? `查询 ${functionInfo?.name}` : "提交"}
-                                    </Button>
-                                    : <ConnectWalletBtn danger />}
+                                </Form>
 
                             </div>
                         </div>
-                    </div>
-                </>
-                : '请先从方法列表中选择一个方法'}
+                    </>
+                    : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+            </div>
         </Card>)
 }

@@ -1,0 +1,20 @@
+.root {
+    @apply h-full overflow-hidden overflow-y-auto min-w-60 font-mono;
+
+    .item {
+        @apply cursor-pointer;
+
+        .index {
+            @apply text-gray-400 w-7 text-right inline-block;
+        }
+    }
+
+    .current {
+        @extend .item;
+        @apply bg-blue-500 text-white;
+
+        .index {
+            @apply text-white/80;
+        }
+    }
+}

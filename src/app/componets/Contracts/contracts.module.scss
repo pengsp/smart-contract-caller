@@ -40,6 +40,27 @@
     }
 }
 
+.option {
+    @apply p-2 transition-colors rounded cursor-pointer relative;
+
+    &:hover {
+        // @apply bg-[--base-blue-50] border-[--base-blue-50] text-white transition-colors;
+    }
+
+    .name {
+        @apply font-bold;
+    }
+
+    .address {
+        @apply text-sm;
+    }
+
+    .chainInfo {
+        @apply text-sm flex gap-1 pt-2 text-gray-600;
+    }
+}
+
+
 .networks_wrap {
     @apply grid grid-cols-3 gap-4 text-xs;
 }
