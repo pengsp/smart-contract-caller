@@ -47,3 +47,10 @@ export const toHex = (num: number) => {
   const val = Number(num);
   return "0x" + val.toString(16);
 };
+
+export const stringifyReplacer = (key: string, value: any) => {
+  if (typeof value === 'bigint') {
+    return value.toString();
+  }
+  return value;
+} 

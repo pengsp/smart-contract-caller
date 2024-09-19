@@ -28,7 +28,7 @@ export default function Functions({ contract, select }: { contract: Contract | n
         setPageLoading(false)
     }, [hash])
     return (
-        <Card title={`方法列表 [${functions.length || 0}]`} rootClassName="h-full overflow-hidden gap-4 flex flex-col">
+        <Card title={`方法列表 [${functions.length || 0}]`} rootClassName="h-full overflow-hidden gap-4 flex flex-col shrink-0 min-w-64">
             <Select
                 showSearch
                 style={{ width: '100%' }}

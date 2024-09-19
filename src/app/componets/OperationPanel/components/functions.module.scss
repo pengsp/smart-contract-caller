@@ -1,5 +1,5 @@
 .root {
-    @apply h-full overflow-hidden overflow-y-auto min-w-60 font-mono;
+    @apply h-full overflow-hidden overflow-y-auto min-w-64 font-mono;
 
     .item {
         @apply cursor-pointer;

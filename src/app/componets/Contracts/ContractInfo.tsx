@@ -1,13 +1,14 @@
 "use client"
 import { Contract } from "@/types";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { lazy, useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { Button, Descriptions, Popconfirm, Skeleton, Tooltip } from 'antd';
+import { Button, Descriptions, Empty, Modal, Popconfirm, Skeleton, Tooltip } from 'antd';
 import { networks } from "@/configs";
 import { Typography } from 'antd';
 import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { useLocalStorageState } from "ahooks";
 import { defaultContract, LocalStorageContracts, LocalStorageCurrentContract } from "@/constants";
+const LazyReactJson = lazy(() => import("react-json-view"))
 
 const { Paragraph } = Typography;
 
@@ -29,7 +30,18 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
         },
     );
     const [contract, setContract] = useState<Contract | null>(null)
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const showABIModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleOk = () => {
+        setIsModalOpen(false);
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
     const actionDeleteContract = (hash?: string) => {
         if (contract) {
             const _localContracts = localContracts?.filter(item => item.hash != hash)
@@ -92,15 +104,15 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
                 key: 'action',
                 label: '操作',
                 children: <div className="flex gap-2">
-                    <Button size="small" onClick={actionEditContract} icon={<EyeOutlined />} disabled={pageLoading || currentContractHash == ''}>查看ABI</Button>
-                    <Button size="small" onClick={actionEditContract} icon={<EditOutlined />} disabled={pageLoading || currentContractHash == ''}>编辑</Button>
+                    <Button size="small" onClick={showABIModal} icon={<EyeOutlined />} disabled={pageLoading || currentContractHash == ''}>查看ABI</Button>
+                    <Button size="small" onClick={actionEditContract} icon={<EditOutlined />} disabled={pageLoading || currentContractHash == ''}>编辑合约</Button>
                     <Popconfirm
                         title="删除合约"
                         description="确定删除这个合约?"
                         onConfirm={() => actionDeleteContract(contract?.hash)}
                         okText="确定"
                         cancelText="取消"
-                    >    <Button danger size="small" icon={<DeleteOutlined />} disabled={pageLoading || currentContractHash == ''} >删除</Button>
+                    >    <Button danger size="small" icon={<DeleteOutlined />} disabled={pageLoading || currentContractHash == ''} >删除合约</Button>
                     </Popconfirm>
 
                 </div>,
@@ -118,6 +130,14 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
             items={contractItems}
             className="whitespace-nowrap"
         />
+        <Modal title={`${contract && contract.name} ABI`} open={isModalOpen} onOk={handleOk} width={720} onCancel={handleCancel} footer={null}>
+            <div className="h-[50vh] overflow-auto">
+                {contract ? <LazyReactJson src={contract.abi} name={false} collapsed={2} /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+            </div>
+            <div className="flex justify-end mt-5">
+                <Button type="primary" onClick={handleOk}>确定</Button>
+            </div>
+        </Modal>
     </>)
 }
 
@@ -126,14 +146,14 @@ function BlockExplorerLinks({ chainId, contractAddrss }: { chainId: string, cont
     if (network) {
         return <Tooltip title={`在 ${network.chainName} 区块浏览器查看`}>
             <a key={network.chainId}
-                className="flex justify-center border py-1 px-2 rounded gap-1 relative bg-gray-100  text-xs"
+                className="flex justify-center border py-1 px-2 rounded gap-1 relative bg-gray-100  "
                 href={`${network.blockExplorerUrls[0]}address/${contractAddrss} `}
                 target="_blank"
             >
                 {network?.iconUrls && network?.iconUrls?.length > 0
                     ? <Image src={network.iconUrls[0]} width={16} height={16} alt={`${network.chainName}`} />
                     : <Image src="/images/other.svg" width={16} height={16} alt={`${network.chainName}`} />}
-                <span className="">{network.chainName}</span>
+                <span className="text-xs">{network.chainName}</span>
             </a>
         </Tooltip>
     } else {

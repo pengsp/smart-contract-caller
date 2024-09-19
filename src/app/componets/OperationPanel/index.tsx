@@ -1,15 +1,14 @@
 "use client"
 import { LocalStorageContracts, LocalStorageCurrentContract } from "@/constants";
-import { Contract } from "@/types";
+import { Contract, EventLog, TransactionLog, Log } from "@/types";
 import { useLocalStorageState } from "ahooks";
 import { useCallback, useEffect, useState } from "react";
 import Functions from "./components/Functions";
 import Caller from "./components/Caller";
 import Logs from "./components/Logs";
-import { Spin } from "antd";
+import dayjs from "dayjs";
 
 export default function OperationPanel() {
-    const [pageLoading, setPageLoading] = useState(true)
     const [localContracts, setLocalContracts] = useLocalStorageState<Contract[]>(
         LocalStorageContracts,
         {
@@ -26,7 +25,7 @@ export default function OperationPanel() {
     );
     const [contract, setContract] = useState<Contract | null>(null)
     const [currentFunction, setCurrentFunction] = useState<Record<string, any> | null>()
-    const [logs, setLogs] = useState([])
+    const [logs, setLogs] = useState<Log[]>([])
     useEffect(() => {
         if (currentContractHash && localContracts) {
             const target = localContracts.find(contract => contract.hash == currentContractHash);
@@ -36,22 +35,25 @@ export default function OperationPanel() {
         }
     }, [localContracts, currentContractHash])
 
-    const updateLogs = useCallback(() => {
-
+    const updateLogs = useCallback((log: Log) => {
+        log.createdAt = dayjs().format("HH:mm:ss")
+        console.log('updateLogs', log)
+        setLogs(logs => [...logs, log])
     }, [logs])
-    const clearLogs = () => {
+    const clearLogs = useCallback(() => {
         setLogs([])
-    }
+    }, [logs])
     return (<>
         <div className="flex gap-4 h-full overflow-hidden">
             <Functions contract={contract} select={(functionItem) => setCurrentFunction(functionItem)} />
             <div className="grow flex flex-col gap-4">
-                <div className="basis-1/2">
-                    <Logs logs={logs} />
+                <div className="basis-1/2  overflow-hidden">
+                    <Logs logs={logs} clearLogs={clearLogs} />
                 </div>
-                <div className="basis-1/2">
-                    <Caller contract={contract} functionInfo={currentFunction} updateLogs={() => { }} />
+                <div className="basis-1/2 overflow-hidden ">
+                    <Caller contract={contract} functionInfo={currentFunction} updateLogs={updateLogs} />
                 </div>
+
             </div>
         </div>
     </>)

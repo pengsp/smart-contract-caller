@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <>
       <Nav />
-      <div className=" h-[calc(100vh-112px)] bg-gray-100 p-4 flex flex-col">
+      <div className=" h-[calc(100vh-112px)] min-h-[900px] bg-gray-100 p-4 flex flex-col">
         <Card rootClassName="bg-white flex flex-col gap-4 h-full">
           <Contracts />
           <OperationPanel />
