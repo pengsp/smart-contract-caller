@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useWeb3React } from "@web3-react/core";
 import { Button, Modal } from "antd";
 import { useCallback, useState } from "react";
-import { IconMetaMask } from "./iconMetaMask";
+import { IconMetaMask } from "./IconMetaMask";
 
 export default function ConnectWalletBtn(props: { [propName: string]: any }) {
     const { connect, disconnect } = useAuth()
