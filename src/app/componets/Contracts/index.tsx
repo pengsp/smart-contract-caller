@@ -6,8 +6,6 @@ import { useLocalStorageState } from "ahooks";
 import { LocalStorageContracts, LocalStorageCurrentContract } from "@/constants";
 import ContractList from "./ContractList";
 import ContractInfo from "./ContractInfo";
-
-
 export default function Contracts() {
     const contractEditorRef = useRef<ContractEditorRef>(null)
     const [localContracts, setLocalContracts] = useLocalStorageState<Contract[]>(
@@ -45,6 +43,8 @@ export default function Contracts() {
         }
     }, [localContracts, currentContractHash])
 
+
+    /* =====  */
     return (<>
         <ContractList add={actionAddContract} />
         <ContractInfo edit={actionEditContract} />

@@ -9,7 +9,8 @@ import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { useLocalStorageState } from "ahooks";
 import { defaultContract, LocalStorageContracts, LocalStorageCurrentContract } from "@/constants";
 const LazyReactJson = lazy(() => import("react-json-view"))
-
+import UTT_INIT_DATA from "../../../configs/UTT-init-data.json"
+const INIT_TEST_CONTRACT = process.env.NEXT_PUBLIC_INIT_TEST_CONTRACT === "true" ? true : false
 const { Paragraph } = Typography;
 
 export default function ContractInfo({ edit }: { edit: (contract: Contract) => void }) {
@@ -103,23 +104,28 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
             {
                 key: 'action',
                 label: '操作',
-                children: <div className="flex gap-2">
-                    <Button size="small" onClick={showABIModal} icon={<EyeOutlined />} disabled={pageLoading || currentContractHash == ''}>查看ABI</Button>
-                    <Button size="small" onClick={actionEditContract} icon={<EditOutlined />} disabled={pageLoading || currentContractHash == ''}>编辑合约</Button>
-                    <Popconfirm
-                        title="删除合约"
-                        description="确定删除这个合约?"
-                        onConfirm={() => actionDeleteContract(contract?.hash)}
-                        okText="确定"
-                        cancelText="取消"
-                    >    <Button danger size="small" icon={<DeleteOutlined />} disabled={pageLoading || currentContractHash == ''} >删除合约</Button>
-                    </Popconfirm>
+                children: pageLoading ? <div className="flex gap-2">
+                    <div className="w-20"><Skeleton.Button active block size="small" /></div>
+                    <div className="w-20"><Skeleton.Button active block size="small" /></div>
+                    <div className="w-20"><Skeleton.Button active block size="small" /></div>
+                </div>
+                    : <div className="flex gap-2">
+                        <Button size="small" onClick={showABIModal} icon={<EyeOutlined />} disabled={!hash}>查看ABI</Button>
+                        <Button size="small" onClick={actionEditContract} icon={<EditOutlined />} disabled={!hash}>编辑合约</Button>
+                        <Popconfirm
+                            title="删除合约"
+                            description="确定删除这个合约?"
+                            onConfirm={() => actionDeleteContract(contract?.hash)}
+                            okText="确定"
+                            cancelText="取消"
+                        >    <Button danger size="small" icon={<DeleteOutlined />} disabled={!hash || INIT_TEST_CONTRACT} >删除合约</Button>
+                        </Popconfirm>
+                    </div>
 
-                </div>,
             },
         ]
 
-    }, [contract]);
+    }, [contract, pageLoading]);
     useEffect(() => {
         setPageLoading(false)
     }, [])

@@ -153,91 +153,93 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
 
     }, [contractInstance, functionInfo, callInputs, updateLogs, callFunctionData])
     return (
-        <Card title={functionInfo && <div className="font-bold text-lg font-mono">
+        <Card title={functionInfo ? <div className="font-bold text-lg font-mono">
             <FunctionRender name={functionInfo?.name} values={functionInfo.inputs?.map((input: Record<string, any>, index: number) => input.name)} />
-        </div>
+        </div> : <>操作面板</>
         } rootClassName=" h-full flex flex-col overflow" >
-            {functionInfo ?
-                <div className="flex gap-4 h-full overflow-hidden font-mono  box-border pt-4">
-                    <div className="bg-gray-50 p-4 px-6 flex flex-col  h-full box-border min-w-64 shrink-0  overflow-auto ">
-                        <InfoItem name="Name" value={functionInfo?.name} />
-                        <InfoItem name="State Mutability" value={functionInfo?.stateMutability} />
-                        {functionInfo?.inputs.length > 0 && <Params type="inputs" params={functionInfo?.inputs} />}
-                        {functionInfo?.outputs.length > 0 && <Params type="outputs" params={functionInfo?.outputs} />}
-                    </div>
-                    <div className=" bg-gray-50 p-4 px-6 grow h-full overflow-auto">
-                        <Form
-                            name="callFunctionForm"
-                            autoComplete="off"
-                            layout="vertical"
-                            form={callFunctionForm}
-                            colon
-                            style={{ maxWidth: "500px" }}
-                        >
-                            {functionInfo?.stateMutability === "payable" &&
-                                <Form.Item
-                                    label={`支付${nativeCurrency || ''}数量`}
-                                    name="eth"
-                                    rules={[{ required: true, message: `请输入支付的${nativeCurrency || ''}数量` }]}
-                                    validateTrigger="onBlur"
-                                    className="!mb-2">
-                                    <Input
-                                        placeholder={`请输入${nativeCurrency || ''}数量`}
-                                        key={functionInfo.name}
-                                        value={callFunctionData}
-                                        allowClear
-                                        onChange={updateCallFunctionData}
-                                    />
-                                </Form.Item>}
+            <div className="flex gap-4 h-full overflow-hidden font-mono  box-border pt-4">
+                <div className="bg-gray-50 p-4 px-6 flex flex-col  h-full box-border min-w-64 shrink-0  overflow-auto ">
+                    {functionInfo ? <>
+                        {functionInfo?.name && <InfoItem name="Name" value={functionInfo.name} />}
+                        {functionInfo?.stateMutability && <InfoItem name="State Mutability" value={functionInfo.stateMutability} />}
+                        {functionInfo?.inputs.length > 0 && <Params type="inputs" params={functionInfo.inputs} />}
+                        {functionInfo?.outputs.length > 0 && <Params type="outputs" params={functionInfo.outputs} />}
+                    </> : <div className="h-full flex flex-col justify-center"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>}
+                </div>
+                <div className=" bg-gray-50 p-4 px-6 grow h-full overflow-auto box-border">
+                    <Form
+                        name="callFunctionForm"
+                        autoComplete="off"
+                        layout="vertical"
+                        form={callFunctionForm}
+                        colon
+                        style={functionInfo ? { maxWidth: "500px" } : { height: "100%" }}
+                    >
+                        {functionInfo?.stateMutability === "payable" &&
+                            <Form.Item
+                                label={`支付${nativeCurrency || ''}数量`}
+                                name="eth"
+                                rules={[{ required: true, message: `请输入支付的${nativeCurrency || ''}数量` }]}
+                                validateTrigger="onBlur"
+                                className="!mb-2">
+                                <Input
+                                    placeholder={`请输入${nativeCurrency || ''}数量`}
+                                    key={functionInfo.name}
+                                    value={callFunctionData}
+                                    allowClear
+                                    onChange={updateCallFunctionData}
+                                />
+                            </Form.Item>}
 
-                            {params.map((input: any, index: number) => {
-                                return <Form.Item
-                                    label={input.name || input.internalType}
-                                    name={input.name}
+                        {params?.map((input: any, index: number) => {
+                            return <Form.Item
+                                label={input.name || input.internalType}
+                                name={input.name}
+                                key={input.name}
+                                validateTrigger="onBlur"
+                                rules={[{
+                                    validator: (_, value) => {
+                                        if (!value) {
+                                            return Promise.reject(new Error(`${input.name}不能为空`))
+                                        }
+                                        if (input.type == 'address') {
+                                            return isAddress(value) ? Promise.resolve() : Promise.reject(new Error(`checksum 失败，不合法的地址`))
+                                        }
+                                        return Promise.resolve()
+                                    }
+                                }]}
+                                className="!mb-2">
+                                <Input
                                     key={input.name}
-                                    validateTrigger="onBlur"
-                                    rules={[{
-                                        validator: (_, value) => {
-                                            if (!value) {
-                                                return Promise.reject(new Error(`${input.name}不能为空`))
-                                            }
-                                            if (input.type == 'address') {
-                                                return isAddress(value) ? Promise.resolve() : Promise.reject(new Error(`checksum 失败，不合法的地址`))
-                                            }
-                                            return Promise.resolve()
-                                        }
-                                    }]}
-                                    className="!mb-2">
-                                    <Input
-                                        key={input.name}
-                                        placeholder={input.type}
-                                        allowClear
-                                        // value={callInputs[index] ? callInputs[index] : ''}
-                                        onClear={() => updateCallInputs('', index)}
-                                        onChange={(event: any) => {
-                                            const input = event.currentTarget.value;
-                                            updateCallInputs(input, index)
-                                        }
-                                        }
-                                    />
-                                </Form.Item>
-                            }
-                            )}
+                                    placeholder={input.type}
+                                    allowClear
+                                    // value={callInputs[index] ? callInputs[index] : ''}
+                                    onClear={() => updateCallInputs('', index)}
+                                    onChange={(event: any) => {
+                                        const input = event.currentTarget.value;
+                                        updateCallInputs(input, index)
+                                    }
+                                    }
+                                />
+                            </Form.Item>
+                        }
+                        )}
+                        {functionInfo ?
                             <Form.Item label="" className="!mb-2">
                                 <div className="pt-4">
                                     {isLogined
                                         ? <> <Button onClick={callFunction} type="primary" loading={loading} disabled={!networkSupportCheck} >
-                                            {functionInfo.stateMutability == 'view' ? `查询` : `执行`} {functionInfo?.name}
+                                            {functionInfo?.stateMutability == 'view' ? `查询` : `执行`} {functionInfo?.name}
                                         </Button>
                                             {!networkSupportCheck && <NetworkSwitchBtn supportedChainids={chainIds} />}
                                         </>
                                         : <ConnectWalletBtn danger block />}
                                 </div>
-                            </Form.Item>
-                        </Form>
+                            </Form.Item> : <div className="h-full flex flex-col justify-center"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>}
+                    </Form>
 
-                    </div>
                 </div>
-                : <div className="h-full flex flex-col justify-center"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>}
+            </div>
+            {/* <div className="h-full flex flex-col justify-center"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div> */}
         </Card>)
 }
