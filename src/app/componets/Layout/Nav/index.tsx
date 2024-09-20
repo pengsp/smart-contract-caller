@@ -6,7 +6,7 @@ export default function Nav() {
             <div className="flex justify-between items-center">
                 <div>
                     <div className="text-2xl">智能合约调试工具</div>
-                    <p className="text-gray-400 mt-2">通过ABI直接调用合约方法，无需验证合约。</p>
+                    <p className="text-gray-400 mt-2">合约调用，如此简单。</p>
                 </div>
                 <Connection />
             </div>

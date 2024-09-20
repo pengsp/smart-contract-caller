@@ -69,7 +69,7 @@ function Event({ log }: { log: EventLog }) {
         <div className="break-keep text-blue-800">Event:</div>
         <div>
             {log.events.map((event: EventItem, index: number) => {
-                return <div> <FunctionRender key={index} name={event.name} values={event.values} /></div>
+                return <div key={index}> <FunctionRender key={index} name={event.name} values={event.values} /></div>
             })}
         </div>
     </div>)
