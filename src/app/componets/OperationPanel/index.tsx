@@ -37,7 +37,7 @@ export default function OperationPanel() {
 
     const updateLogs = useCallback((log: Log) => {
         log.createdAt = dayjs().format("HH:mm:ss")
-        console.log('updateLogs', log)
+        // console.log('updateLogs', log)
         setLogs(logs => [...logs, log])
     }, [logs])
     const clearLogs = useCallback(() => {

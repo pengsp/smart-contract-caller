@@ -41,10 +41,7 @@ function TransactionWait({ log }: { log: TransactionLog }) {
             <span className="text-gray-400 shrink-0">[{log.createdAt}]</span>
             <div>
                 <div className="font-bold  font-mono">
-                    <span className="text-red-800">{log?.function}</span>
-                    <span className="text-blue-800">(</span>
-                    {log.params && <span className="text-orange-400">{log.params.join(',')}</span>}
-                    <span className="text-blue-800">)</span>
+                    <FunctionRender name={log.function} values={log.params || []} />
                     {log.value && <span className="text-blue-400 ml-4">支付 {log.value}</span>}
 
                 </div>
@@ -72,15 +69,19 @@ function Event({ log }: { log: EventLog }) {
         <div className="break-keep text-blue-800">Event:</div>
         <div>
             {log.events.map((event: EventItem, index: number) => {
-                return <div key={index}>
-                    <span className="text-red-800">{event.name}</span>
-                    <span className="text-blue-800">{'('}</span>
-                    {event.values.map((value: any, index: number) => {
-                        return <span key={index}><span className="text-orange-400">{value.toString()}</span>{index != event.values.length - 1 && <span className="text-gray-500">,</span>}</span>
-                    })}
-                    <span className="text-blue-800">{')'}</span>
-                </div>
+                return <div> <FunctionRender key={index} name={event.name} values={event.values} /></div>
             })}
         </div>
     </div>)
+}
+
+export function FunctionRender({ name, values }: { name: string, values: any[] }) {
+    return (<span className="font-bold font-mono">
+        <span className="text-red-800">{name}</span>
+        <span className="text-blue-800">{'('}</span>
+        {values.map((value: any, index: number) => {
+            return <span key={index}><span className="text-orange-300">{value.toString()}</span>{index != values.length - 1 && <span className="text-gray-400">,</span>}</span>
+        })}
+        <span className="text-blue-800">{')'}</span>
+    </span>)
 }

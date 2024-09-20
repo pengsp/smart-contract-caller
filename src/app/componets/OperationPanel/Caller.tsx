@@ -13,6 +13,7 @@ import { isAddress, parseEther } from "ethers"
 import { Decoder } from "ts-abi-decoder";
 import { networks } from "@/configs"
 import NetworkSwitchBtn from "../Connection/NetworkSwitchBtn"
+import { FunctionRender } from "./Logs"
 
 export default function Caller({ contract, functionInfo, updateLogs }: {
     contract: Record<string, any> | null,
@@ -153,12 +154,7 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
     }, [contractInstance, functionInfo, callInputs, updateLogs, callFunctionData])
     return (
         <Card title={functionInfo && <div className="font-bold text-lg font-mono">
-            <span className="text-red-800">{functionInfo?.name}</span>
-            <span className="text-blue-800">(</span>
-            {functionInfo.inputs?.map((input: Record<string, any>, index: number) => {
-                return <span key={index}><span className="text-orange-400">{input.name}</span>{index != functionInfo.inputs.length - 1 && <span className="text-gray-300">,</span>}</span>
-            })}
-            <span className="text-blue-800">)</span>
+            <FunctionRender name={functionInfo?.name} values={functionInfo.inputs?.map((input: Record<string, any>, index: number) => input.name)} />
         </div>
         } rootClassName=" h-full flex flex-col overflow" >
             {functionInfo ?
@@ -180,13 +176,13 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                         >
                             {functionInfo?.stateMutability === "payable" &&
                                 <Form.Item
-                                    label={`支付${nativeCurrency}数量`}
+                                    label={`支付${nativeCurrency || ''}数量`}
                                     name="eth"
-                                    rules={[{ required: true, message: `请输入支付的${nativeCurrency}数量` }]}
+                                    rules={[{ required: true, message: `请输入支付的${nativeCurrency || ''}数量` }]}
                                     validateTrigger="onBlur"
                                     className="!mb-2">
                                     <Input
-                                        placeholder={`请输入${nativeCurrency}数量`}
+                                        placeholder={`请输入${nativeCurrency || ''}数量`}
                                         key={functionInfo.name}
                                         value={callFunctionData}
                                         allowClear
