@@ -1,6 +1,5 @@
 import Image from "next/image";
 import classes from "./networkItem.module.scss"
-import { CheckCircleOutlined, CheckOutlined, CheckSquareOutlined } from "@ant-design/icons";
 import { Network } from "@/types";
 
 export default function NetworkItem({ network, selected = false }: { network: Network, selected: boolean }) {

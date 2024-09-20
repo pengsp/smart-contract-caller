@@ -12,6 +12,7 @@ import { stringifyReplacer } from "@/utils"
 import { isAddress, parseEther } from "ethers"
 import { Decoder } from "ts-abi-decoder";
 import { networks } from "@/configs"
+import NetworkSwitchBtn from "../../Connection/NetworkSwitchBtn"
 
 export default function Caller({ contract, functionInfo, updateLogs }: {
     contract: Record<string, any> | null,
@@ -19,7 +20,7 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
     updateLogs: (log: any) => void
 }) {
     const { account, chainId, connector, provider } = useWeb3React()
-    const { abi, name, hash, address } = contract || defaultContract;
+    const { abi, name, hash, address, chainIds } = contract || defaultContract;
     const [callFunctionData, setCallFunctionData] = useState<any>()
     const [callInputs, setCallInputs] = useState<any[]>([])
     const [isLogined, setIsLogined] = useState(false)
@@ -31,6 +32,7 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
     const explorer = currentNetwork?.blockExplorerUrls[0]
     const contractInstance = useContract(address, abi)
     const [callFunctionForm] = Form.useForm();
+    const [networkSupportCheck, setNetworkSupportCheck] = useState(false)
 
     useEffect(() => {
         setIsLogined(account ? true : false)
@@ -40,6 +42,16 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
         setCallFunctionData('')
         setCallInputs([])
     }, [functionInfo])
+    useEffect(() => {
+        if (chainIds.length == 0) {
+            setNetworkSupportCheck(true)
+        } else {
+            const supportCheck = chainIds.find((cid: string) => {
+                return Number(chainId) == Number(cid)
+            })
+            setNetworkSupportCheck(supportCheck ? true : false)
+        }
+    }, [chainId, chainIds])
 
     const updateCallFunctionData = (event: any) => {
         const input = event.currentTarget.value
@@ -223,9 +235,11 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                             <Form.Item label="" className="!mb-2">
                                 <div className="pt-4">
                                     {isLogined
-                                        ? <Button onClick={callFunction} type="primary" loading={loading} >
+                                        ? <> <Button onClick={callFunction} type="primary" loading={loading} disabled={!networkSupportCheck} >
                                             {functionInfo.stateMutability == 'view' ? `查询 ${functionInfo?.name}` : "提交"}
                                         </Button>
+                                            {!networkSupportCheck && <NetworkSwitchBtn supportedChainids={chainIds} />}
+                                        </>
                                         : <ConnectWalletBtn danger block />}
                                 </div>
                             </Form.Item>

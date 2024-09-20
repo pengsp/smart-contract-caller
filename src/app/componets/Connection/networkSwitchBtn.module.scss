@@ -1,0 +1,8 @@
+.root {
+    @apply bg-white p-4 mt-4;
+
+    .networks_wrap {
+        @apply grid grid-cols-2 gap-4 text-xs;
+    }
+
+}

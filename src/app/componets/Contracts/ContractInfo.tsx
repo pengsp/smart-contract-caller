@@ -97,7 +97,7 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
             // },
             {
                 key: 'chains',
-                label: '部署网络',
+                label: '支持网络',
                 children: pageLoading ? <div className="w-20"><Skeleton.Button active block size="small" /></div> : <div className="flex flex-wrap gap-2">{explorerLinks}</div>,
             },
             {
