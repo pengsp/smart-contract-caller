@@ -39,6 +39,7 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
     }, [account])
     useEffect(() => {
         setLoading(false)
+        callFunctionForm.resetFields()
         setCallFunctionData('')
         setCallInputs([])
     }, [functionInfo])
@@ -58,13 +59,8 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
         setCallFunctionData(input)
     }
     const updateCallInputs = useCallback((value: any, index: number) => {
-        const _callInputs = callInputs.map((input, i) => {
-            if (i == index) {
-                return value
-            } else {
-                return input
-            }
-        })
+        const _callInputs = [...callInputs]
+        _callInputs[index] = value
         setCallInputs([..._callInputs])
     }, [callInputs])
     const callFunction = useCallback(() => {
@@ -77,7 +73,7 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                     stateMutability,
                     explorer,
                 } as Log
-                if (stateMutability === 'view') {
+                if (stateMutability === 'view' || stateMutability === 'pure') {
                     try {
                         const response = await contractInstance![name](...callInputs)
                         const responseType = typeof response;
@@ -104,7 +100,9 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                         console.log('await response', response, response.hash)
                         const hash = response.hash
                         log.hash = hash;
-                        log.value = `${callFunctionData} ${nativeCurrency}`;
+                        if (stateMutability === 'payable') {
+                            log.value = `${callFunctionData} ${nativeCurrency}`;
+                        }
                         updateLogs(log)
                         /*
                             ethers.js v6
@@ -113,9 +111,7 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                             remark at 2024/09/19 
                         */
                         const tx = await response.getTransaction()
-                        console.log('await res', tx)
                         const receipt = await tx.wait()
-                        console.log('await _Res', receipt)
                         log.isMined = true;
                         updateLogs({
                             type: "TransactionMined",
@@ -220,9 +216,8 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                                         key={input.name}
                                         placeholder={input.type}
                                         allowClear
-                                        value={callInputs[index] ? callInputs[index] : ''}
-                                        autoComplete="off"
-                                        onClear={() => updateCallInputs(null, index)}
+                                        // value={callInputs[index] ? callInputs[index] : ''}
+                                        onClear={() => updateCallInputs('', index)}
                                         onChange={(event: any) => {
                                             const input = event.currentTarget.value;
                                             updateCallInputs(input, index)
@@ -236,7 +231,7 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                                 <div className="pt-4">
                                     {isLogined
                                         ? <> <Button onClick={callFunction} type="primary" loading={loading} disabled={!networkSupportCheck} >
-                                            {functionInfo.stateMutability == 'view' ? `查询 ${functionInfo?.name}` : "提交"}
+                                            {functionInfo.stateMutability == 'view' ? `查询` : `执行`} {functionInfo?.name}
                                         </Button>
                                             {!networkSupportCheck && <NetworkSwitchBtn supportedChainids={chainIds} />}
                                         </>
