@@ -3,9 +3,9 @@ import { LocalStorageContracts, LocalStorageCurrentContract } from "@/constants"
 import { Contract, EventLog, TransactionLog, Log } from "@/types";
 import { useLocalStorageState } from "ahooks";
 import { useCallback, useEffect, useState } from "react";
-import Functions from "./components/Functions";
-import Caller from "./components/Caller";
-import Logs from "./components/Logs";
+import Functions from "./Functions";
+import Caller from "./Caller";
+import Logs from "./Logs";
 import dayjs from "dayjs";
 
 export default function OperationPanel() {

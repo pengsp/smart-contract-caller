@@ -1,7 +1,7 @@
 import { Contract } from "@/types";
 import { Empty, Select, Skeleton } from "antd";
 import { useEffect, useState } from "react";
-import Card from "../../Layout/Card";
+import Card from "../Layout/Card";
 import classes from "./functions.module.scss";
 import { defaultContract } from "@/constants";
 

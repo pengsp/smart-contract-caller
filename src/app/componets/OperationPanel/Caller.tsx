@@ -1,18 +1,18 @@
 import { Button, Empty, Form, Input } from "antd"
 import { useCallback, useEffect, useState } from "react"
-import ConnectWalletBtn from "../../Connection/ConnectWalletBtn"
+import ConnectWalletBtn from "../Connection/ConnectWalletBtn"
 import { useWeb3React } from "@web3-react/core"
 import { useContract } from "@/hooks/useContract"
 import InfoItem from "./InfoItem"
 import Params from "./ParamsItem"
-import Card from "../../Layout/Card"
+import Card from "../Layout/Card"
 import { defaultContract } from "@/constants"
 import { Log, EventItem } from "@/types"
 import { stringifyReplacer } from "@/utils"
 import { isAddress, parseEther } from "ethers"
 import { Decoder } from "ts-abi-decoder";
 import { networks } from "@/configs"
-import NetworkSwitchBtn from "../../Connection/NetworkSwitchBtn"
+import NetworkSwitchBtn from "../Connection/NetworkSwitchBtn"
 
 export default function Caller({ contract, functionInfo, updateLogs }: {
     contract: Record<string, any> | null,

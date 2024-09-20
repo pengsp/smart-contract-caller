@@ -1,6 +1,6 @@
 "use client"
 import { EventLog, Log, TransactionLog, LogType, EventItem } from "@/types";
-import Card from "../../Layout/Card";
+import Card from "../Layout/Card";
 import { lazy, useEffect, useRef } from "react";
 import { Button, Empty } from "antd";
 import { ClearOutlined } from "@ant-design/icons";
