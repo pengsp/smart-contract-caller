@@ -2,7 +2,7 @@
 import { EventLog, Log, TransactionLog, LogType, EventItem } from "@/types";
 import Card from "../../Layout/Card";
 import { lazy, useEffect, useRef } from "react";
-import { Button } from "antd";
+import { Button, Empty } from "antd";
 import { ClearOutlined } from "@ant-design/icons";
 // import ReactJson from 'react-json-view'
 const LazyReactJson = lazy(() => import("react-json-view"))
@@ -19,7 +19,7 @@ export default function Logs({ logs, clearLogs }: { logs: Log[], clearLogs: () =
         extra={<Button icon={<ClearOutlined />} onClick={clearLogs} size="small">清除Logs</Button>}
         rootClassName="h-full flex flex-col" >
         <div className="py-4 text-xs whitespace-normal break-all h-full overflow-auto  box-border " ref={logsRef}>
-            {logs.map((log: Log, index: number) => {
+            {(logs && logs.length > 0) ? logs.map((log: Log, index: number) => {
                 if (log.type == "Event") {
                     return <Event log={log as EventLog} key={index} />
                 } else if (log.type == "TransactionMined") {
@@ -28,7 +28,9 @@ export default function Logs({ logs, clearLogs }: { logs: Log[], clearLogs: () =
                     return <TransactionWait log={log as TransactionLog} key={index} />
                 }
 
-            })}
+            })
+                : <div className="h-full flex flex-col justify-center"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>
+            }
         </div>
 
     </Card>

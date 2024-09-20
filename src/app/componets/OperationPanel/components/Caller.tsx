@@ -247,6 +247,6 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
 
                     </div>
                 </div>
-                : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+                : <div className="h-full flex flex-col justify-center"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>}
         </Card>)
 }

@@ -1,4 +1,3 @@
-"use client";
 import { getConnection, getRecentConnectionMeta, setRecentConnectionMeta } from "@/connection";
 class FailedToConnect extends Error { }
 
@@ -26,7 +25,7 @@ export function useAuth() {
   async function connect() {
     if (window.ethereum == null) {
       console.log('请先安装metamask')
-      return
+      return { error: "METAMASK_NOT_INSTALLED" }
     }
     const connection = getConnection();
     try {
