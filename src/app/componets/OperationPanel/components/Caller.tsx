@@ -9,7 +9,7 @@ import Card from "../../Layout/Card"
 import { defaultContract } from "@/constants"
 import { Log, EventItem } from "@/types"
 import { stringifyReplacer } from "@/utils"
-import { parseEther } from "ethers"
+import { isAddress, parseEther } from "ethers"
 import { Decoder } from "ts-abi-decoder";
 import { networks } from "@/configs"
 
@@ -30,105 +30,118 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
     const nativeCurrency = currentNetwork?.nativeCurrency.symbol;
     const explorer = currentNetwork?.blockExplorerUrls[0]
     const contractInstance = useContract(address, abi)
+    const [callFunctionForm] = Form.useForm();
+
     useEffect(() => {
         setIsLogined(account ? true : false)
     }, [account])
     useEffect(() => {
         setLoading(false)
+        setCallFunctionData('')
+        setCallInputs([])
     }, [functionInfo])
 
     const updateCallFunctionData = (event: any) => {
         const input = event.currentTarget.value
-        console.log('updateCallFunctionData', input)
         setCallFunctionData(input)
     }
-    const callFunction = useCallback(async () => {
-        setLoading(true)
-        if (contract && functionInfo) {
-            const { name, stateMutability } = functionInfo;
-            const log = {
-                function: name,
-                stateMutability,
-                explorer,
-            } as Log
-            if (stateMutability === 'view') {
-                try {
-                    const response = await contractInstance![name](...callInputs)
-                    const responseType = typeof response;
-                    log.type = "View";
-                    if (responseType == 'object') {
-                        log.result = JSON.parse(JSON.stringify(response, stringifyReplacer))
-                    } else {
-                        //if data is primitive data type, parse to string
-                        log.result = response.toString()
+    const updateCallInputs = useCallback((value: any, index: number) => {
+        const _callInputs = callInputs.map((input, i) => {
+            if (i == index) {
+                return value
+            } else {
+                return input
+            }
+        })
+        setCallInputs([..._callInputs])
+    }, [callInputs])
+    const callFunction = useCallback(() => {
+        callFunctionForm.validateFields().then(async () => {
+            setLoading(true)
+            if (contract && functionInfo) {
+                const { name, stateMutability } = functionInfo;
+                const log = {
+                    function: name,
+                    stateMutability,
+                    explorer,
+                } as Log
+                if (stateMutability === 'view') {
+                    try {
+                        const response = await contractInstance![name](...callInputs)
+                        const responseType = typeof response;
+                        log.type = "View";
+                        if (responseType == 'object') {
+                            log.result = JSON.parse(JSON.stringify(response, stringifyReplacer))
+                        } else {
+                            //if data is primitive data type, parse to string
+                            log.result = response.toString()
+                        }
+                        updateLogs(log)
+                    } catch (e: any) {
+                        log.error = e
+                        updateLogs(log)
+                    } finally {
+                        setLoading(false)
                     }
-                    updateLogs(log)
-                } catch (e: any) {
-                    log.error = e
-                    updateLogs(log)
-                } finally {
-                    setLoading(false)
-                }
 
-            } else if (stateMutability === 'nonpayable' || stateMutability === 'payable') {
-                log.params = callInputs
-                log.type = "Transaction";
-                try {
-                    const response = await contractInstance![name](...callInputs, callFunctionData ? { value: parseEther(callFunctionData) } : {})
-                    console.log('await response', response, response.hash)
-                    const hash = response.hash
-                    log.hash = hash;
-                    log.value = `${callFunctionData} ${nativeCurrency}`;
-                    updateLogs(log)
-                    /*
-                        ethers.js v6
-                        if use `await response.wait()` ,will throw an error like `TypeError: receipt.confirmations is not a function`
-                        so instead of `await response.getTransaction()` to get TransactionReceipt 
-                        remark at 2024/09/19 
-                    */
-                    const tx = await response.getTransaction()
-                    console.log('await res', tx)
-                    const receipt = await tx.wait()
-                    console.log('await _Res', receipt)
-                    log.isMined = true;
-                    updateLogs({
-                        type: "TransactionMined",
-                        function: name,
-                        explorer,
-                        hash
-                    })
-                    const events: EventItem[] = []
-                    const decodedLogs = Decoder.decodeLogs(receipt.logs);
-                    // console.log('decodedLogs', decodedLogs)
-                    decodedLogs.forEach((event) => {
-                        // console.log('---event ---', evt)
-                        const values = event?.events?.map((x) => {
-                            if (x?.type === "bytes32") {
-                                x.value.toString();
-                            }
-                            return x?.value ?? false;
-                        });
-                        // addLogItem(`Event: ${evt.name}(${values})`);
-                        // const event = `${evt.name}(${values})`
-                        const eventObj = { name: event.name, values }
-                        console.log('---event log---', log)
-                        events.push(eventObj)
-                    })
-                    if (events.length > 0) {
+                } else if (stateMutability === 'nonpayable' || stateMutability === 'payable') {
+                    log.params = callInputs
+                    log.type = "Transaction";
+                    try {
+                        const response = await contractInstance![name](...callInputs, callFunctionData ? { value: parseEther(callFunctionData) } : {})
+                        console.log('await response', response, response.hash)
+                        const hash = response.hash
+                        log.hash = hash;
+                        log.value = `${callFunctionData} ${nativeCurrency}`;
+                        updateLogs(log)
+                        /*
+                            ethers.js v6
+                            if use `await response.wait()` ,will throw an error like `TypeError: receipt.confirmations is not a function`
+                            so instead of `await response.getTransaction()` to get TransactionReceipt 
+                            remark at 2024/09/19 
+                        */
+                        const tx = await response.getTransaction()
+                        console.log('await res', tx)
+                        const receipt = await tx.wait()
+                        console.log('await _Res', receipt)
+                        log.isMined = true;
                         updateLogs({
-                            type: 'Event',
-                            events,
+                            type: "TransactionMined",
+                            function: name,
+                            explorer,
                             hash
-                        });
+                        })
+                        const events: EventItem[] = []
+                        const decodedLogs = Decoder.decodeLogs(receipt.logs);
+                        decodedLogs.forEach((event) => {
+                            const values = event?.events?.map((x) => {
+                                if (x?.type === "bytes32") {
+                                    x.value.toString();
+                                }
+                                return x?.value ?? false;
+                            });
+                            const eventObj = { name: event.name, values }
+                            events.push(eventObj)
+                        })
+                        if (events.length > 0) {
+                            updateLogs({
+                                type: 'Event',
+                                events,
+                                hash
+                            });
+                        }
+                    } catch (e: any) {
+                        log.error = e
+                        updateLogs(log)
+                    } finally {
+                        setLoading(false)
                     }
-                } catch (e: any) {
-                    log.error = e
-                    updateLogs(log)
-                } finally {
-                    setLoading(false)
                 }
             }
-        }
+        }, (err) => {
+            console.log('validate failed')
+        })
+
     }, [contractInstance, functionInfo, callInputs, updateLogs, callFunctionData])
     return (
         <Card title={functionInfo && <div className="font-bold text-lg font-mono">
@@ -150,9 +163,10 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                     </div>
                     <div className=" bg-gray-50 p-4 px-6 grow h-full overflow-auto">
                         <Form
-                            name="basic"
+                            name="callFunctionForm"
                             autoComplete="off"
                             layout="vertical"
+                            form={callFunctionForm}
                             colon
                             style={{ maxWidth: "500px" }}
                         >
@@ -160,6 +174,8 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                                 <Form.Item
                                     label={`支付${nativeCurrency}数量`}
                                     name="eth"
+                                    rules={[{ required: true, message: `请输入支付的${nativeCurrency}数量` }]}
+                                    validateTrigger="onBlur"
                                     className="!mb-2">
                                     <Input
                                         placeholder={`请输入${nativeCurrency}数量`}
@@ -175,16 +191,29 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                                     label={input.name || input.internalType}
                                     name={input.name}
                                     key={input.name}
+                                    validateTrigger="onBlur"
+                                    rules={[{
+                                        validator: (_, value) => {
+                                            if (!value) {
+                                                return Promise.reject(new Error(`${input.name}不能为空`))
+                                            }
+                                            if (input.type == 'address') {
+                                                return isAddress(value) ? Promise.resolve() : Promise.reject(new Error(`checksum 失败，不合法的地址`))
+                                            }
+                                            return Promise.resolve()
+                                        }
+                                    }]}
                                     className="!mb-2">
                                     <Input
                                         key={input.name}
                                         placeholder={input.type}
                                         allowClear
                                         value={callInputs[index] ? callInputs[index] : ''}
+                                        autoComplete="off"
+                                        onClear={() => updateCallInputs(null, index)}
                                         onChange={(event: any) => {
-                                            const input = event.currentTarget.value
-                                            callInputs[index] = input
-                                            setCallInputs([...callInputs])
+                                            const input = event.currentTarget.value;
+                                            updateCallInputs(input, index)
                                         }
                                         }
                                     />
@@ -192,10 +221,9 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                             }
                             )}
                             <Form.Item label="" className="!mb-2">
-
                                 <div className="pt-4">
                                     {isLogined
-                                        ? <Button onClick={callFunction} type="primary" loading={loading}  >
+                                        ? <Button onClick={callFunction} type="primary" loading={loading} >
                                             {functionInfo.stateMutability == 'view' ? `查询 ${functionInfo?.name}` : "提交"}
                                         </Button>
                                         : <ConnectWalletBtn danger block />}
