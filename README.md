@@ -1,6 +1,6 @@
 
 
-此项目用于提高智能合约联调、测试效率  
+此项目用于提高智能合约联调、测试效率。  
 
 ## 背景
  
@@ -13,12 +13,13 @@
 2. 操作简洁   
 合约所有的方法将以列表的形式展现出来，选择任意方法可查看方法的`类型`、`输入参数`、`输出参数`等数据，同时提供执行方法的入口。
 3. 日志清晰  
-合约操作的日志都会按照时间线在界面上展示，包括操作的方法、返回的数据、txHash、Event、Error等数据
+合约操作的日志都会按照时间线在界面上展示，包括操作的方法、返回的数据、txHash、Event、Error等数据   
+
+更多细节，请自行体验。
 
 
 ## 界面截图
-[myImage]: ./docs/images/screenshot.png "工具界面截图"
-
+<img src="./docs/images/screenshot.png" alt="工具界面截图" width="100%" height="auto">
 
 
 ## 使用
@@ -76,8 +77,8 @@ interface Contract {
     abi: Record<string, any>[],//合约的ABI，它应该是一个数组
     timestamp: number//时间戳，用来标记合约的更新时间
 }
-// hash字段仅用来作为唯一索引，可以是任何string，只要确保不会被后面新增合约的时候碰撞到即可，正常流程新增合约的时候它是通过 ethers.hashMessage(`${timestamp}`)生成，生成之后编辑合约也不会变化
 ```
+参数里的`hash`字段仅用来作为唯一索引，可以是任何string，只要确保不会被后面新增合约的时候碰撞到即可，正常流程新增合约的时候它是通过 ethers.hashMessage(\`${timestamp}\`)生成，生成之后编辑合约也不会变化。
 
 ### 数据存储说明
 - 合约信息存储在浏览器的`localStorage`里，页面刷新不会丢失
