@@ -1,22 +1,16 @@
 import { networks } from "@/configs"
 import { useWeb3React } from "@web3-react/core"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback } from "react"
 import NetworkItem from "../NetworkItem"
 import { Network } from "@/types"
 import classes from "./networkSwitchBtn.module.scss"
 
 export default function NetworkSwitchBtn({ supportedChainids }: { supportedChainids: string[] }) {
-    const [networkChanging, setNetworkChanging] = useState(false)
 
     const { chainId, connector } = useWeb3React()
-    useEffect(() => {
-        const supportCheck = supportedChainids.find(chainId => {
-            return Number(chainId) == Number(chainId)
-        })
-    }, [chainId, supportedChainids])
+
     const switchNetwork = useCallback(async (network: Network) => {
         if (connector) {
-            setNetworkChanging(true)
             try {
                 //切换网络
                 await connector.provider?.request({
@@ -31,8 +25,6 @@ export default function NetworkSwitchBtn({ supportedChainids }: { supportedChain
                     })
                 }
 
-            } finally {
-                setNetworkChanging(false)
             }
         }
 

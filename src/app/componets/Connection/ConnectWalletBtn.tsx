@@ -24,7 +24,6 @@ export default function ConnectWalletBtn(props: { [propName: string]: any }) {
     const login = useCallback(async () => {
         const res: any = await connect();
         if (res && res?.error == 'METAMASK_NOT_INSTALLED') {
-            console.log(res)
             setIsModalOpen(true);
         }
     }, [connector])

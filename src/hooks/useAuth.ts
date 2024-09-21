@@ -30,15 +30,12 @@ export function useAuth() {
     const connection = getConnection();
     try {
       const { connector, type } = connection;
-      if (connector.connectEagerly) {
-        await connector.connectEagerly();
-      } else {
-        await connector.activate();
-      }
+      await connector.activate();
       setRecentConnectionMeta({
         type,
         disconnected: false,
       });
+
       return null;
     } catch (e: unknown) {
       console.log("e", e);
@@ -57,6 +54,7 @@ export function useAuth() {
 
 async function connect() {
   const connection = getConnection();
+  console.log(connection)
   const { connector } = connection;
 
   // We intentionally omit setting a non-ok status on this trace, as it is expected to fail.

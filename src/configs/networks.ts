@@ -14,18 +14,6 @@ export const networks: Network[] = [
     iconUrls: ["/images/eth.svg"],
   },
   {
-    chainId: `0x144`,// 324
-    chainName: 'zkSync Mainnet',
-    nativeCurrency: {
-      name: 'ETH',
-      symbol: 'ETH',
-      decimals: 18
-    },
-    rpcUrls: ['https://mainnet.era.zksync.io'],
-    blockExplorerUrls: ['https://explorer.zksync.io/'],
-    iconUrls: ["/images/zkSync.svg"],
-  },
-  {
     chainId: `0x38`,// 56
     chainName: 'BNB Smart Chain Mainnet',
     nativeCurrency: {
