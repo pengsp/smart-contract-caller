@@ -1,8 +1,10 @@
 
 
 此项目用于提高智能合约联调、测试效率。  
+无需编写代码，无需合约验证，轻松调用智能合约的所有方法！   
 
-[https://smart-contract-caller.vercel.app/](https://smart-contract-caller.vercel.app/)
+
+预览地址：[https://smart-contract-caller.vercel.app/](https://smart-contract-caller.vercel.app/)
 
 ## 背景
  
@@ -64,11 +66,12 @@ interface Network {
 ```
 
 ### 初始化测试合约配置
-项目自带了一个`ERC20`测试合约，可通过`.env`配置是否加载
+项目自带了一个`ERC20`测试合约的ABI，此合约包含ERC20标准的方法外，还添加了接收各种类型数据的方法用于测试工具对数据的校验和解析是否正确，可通过`.env`配置是否加载
 ```shell
 NEXT_PUBLIC_INIT_TEST_CONTRACT=true # true为加载测试合约
 ```
-测试合约放置在`/src/configs/UTT-init-data.json`,可根据需要修改为自己的合约   
+初始数据配置文件位置：`/src/configs/UTT-init-data.json`   
+可根据需要修改为自己的合约   
 参数类型如下
 ```js
 interface Contract {
