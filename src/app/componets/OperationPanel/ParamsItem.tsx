@@ -28,23 +28,23 @@ export function ParamsItem({ params, level = 1 }: {
                             param.components?.map((item: any, i: number) => {
                                 level++
                                 return <div key={`${item.name}-${i}`} >
-                                    <div className="flex gap-2">
-                                        <span>[{i}]</span>
-                                        <span>{item.type}</span>
-                                        <span>{item.name}</span>
-                                        {item.type == 'tuple' && <span className="text-gray-300">{item.internalType}</span>}
-                                    </div>
+                                    <ParamsTemplate param={item} index={i} />
                                     {item.type == 'tuple' && <ParamsItem params={item.components} key={i} level={level} />}
                                 </div>
                             })
                         }
                     </div>
                 </div>
-                : <div key={`${param.name}-${index}`} className="flex gap-2">
-                    <span>[{index}]</span>
-                    <span>{param.type}</span>
-                    <span>{param.name}</span>
-                </div>
+                : <ParamsTemplate key={`${param.name}-${index}`} param={param} index={index} />
         )}
+    </div>)
+}
+
+function ParamsTemplate({ param, index }: { param: any, index: number }) {
+    return (<div className="flex gap-2">
+        <span>[{index}]</span>
+        <span>{param.type}</span>
+        <span className="text-blue-400 font-bold">{param.name}</span>
+        {param.type != param.internalType && <span className="text-gray-300">{param.internalType}</span>}
     </div>)
 }

@@ -6,7 +6,7 @@ import { Button, Dropdown, Modal, Spin } from "antd";
 import type { MenuProps } from 'antd';
 import { useWeb3React } from "@web3-react/core";
 import { useAuth } from "@/hooks/useAuth";
-import { ApiOutlined, DownOutlined, GlobalOutlined, SwapOutlined } from "@ant-design/icons";
+import { ApiOutlined, DownOutlined, GithubOutlined, GlobalOutlined, SwapOutlined } from "@ant-design/icons";
 import { truncateAddress } from "@/utils";
 import { Network } from "@/types";
 import { networks } from "@/configs";

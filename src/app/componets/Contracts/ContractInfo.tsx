@@ -118,7 +118,7 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
                             onConfirm={() => actionDeleteContract(contract?.hash)}
                             okText="确定"
                             cancelText="取消"
-                        >    <Button danger size="small" icon={<DeleteOutlined />} disabled={!hash || INIT_TEST_CONTRACT} >删除合约</Button>
+                        >    <Button danger size="small" icon={<DeleteOutlined />} disabled={!hash || (!!hash && UTT_INIT_DATA.hash == hash)} >删除合约</Button>
                         </Popconfirm>
                     </div>
 

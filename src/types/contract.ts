@@ -6,3 +6,11 @@ export interface Contract {
     abi: Record<string, any>[],
     timestamp: number
 }
+export interface FunctionItem {
+    name: string,
+    type: string,
+    inputs: any[],
+    outputs: any[],
+    stateMutability: string,
+    [porpName: string]: any
+}

@@ -1,6 +1,6 @@
 {
     "name": "UnitTestToken",
-    "address": "0x22c1710c0d58714dc5b0d185ec3cd52941fc59ce",
+    "address": "0x62b00a916a28553bc1c0868d5ea2d4a33a4f70bb",
     "abi": [
         {
             "inputs": [
@@ -190,6 +190,37 @@
                 {
                     "indexed": true,
                     "internalType": "address",
+                    "name": "_from",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "_to",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "_pay",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "_receive",
+                    "type": "uint256"
+                }
+            ],
+            "name": "MintTo",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
                     "name": "previousOwner",
                     "type": "address"
                 },
@@ -227,19 +258,6 @@
             ],
             "name": "Transfer",
             "type": "event"
-        },
-        {
-            "inputs": [],
-            "name": "EXCHANGE_RATIO",
-            "outputs": [
-                {
-                    "internalType": "uint256",
-                    "name": "",
-                    "type": "uint256"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
         },
         {
             "inputs": [],
@@ -282,7 +300,7 @@
             "inputs": [],
             "name": "alwaysThrowError",
             "outputs": [],
-            "stateMutability": "nonpayable",
+            "stateMutability": "pure",
             "type": "function"
         },
         {
@@ -356,6 +374,19 @@
         },
         {
             "inputs": [],
+            "name": "exchangeRatio",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
             "name": "flipActive",
             "outputs": [],
             "stateMutability": "nonpayable",
@@ -402,7 +433,7 @@
                         },
                         {
                             "internalType": "uint256",
-                            "name": "exchange_ratio",
+                            "name": "exchangeRatio",
                             "type": "uint256"
                         },
                         {
@@ -467,6 +498,19 @@
             "type": "function"
         },
         {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_to",
+                    "type": "address"
+                }
+            ],
+            "name": "mintTo",
+            "outputs": [],
+            "stateMutability": "payable",
+            "type": "function"
+        },
+        {
             "inputs": [],
             "name": "name",
             "outputs": [
@@ -516,6 +560,224 @@
             "name": "renounceOwnership",
             "outputs": [],
             "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "bool",
+                    "name": "boolValue",
+                    "type": "bool"
+                }
+            ],
+            "name": "setBool",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "_boolValue",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "pure",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "bytes",
+                    "name": "bytesValue",
+                    "type": "bytes"
+                }
+            ],
+            "name": "setBytes",
+            "outputs": [
+                {
+                    "internalType": "bytes",
+                    "name": "_bytesValue",
+                    "type": "bytes"
+                }
+            ],
+            "stateMutability": "pure",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "bytes3",
+                    "name": "bytes3Value",
+                    "type": "bytes3"
+                }
+            ],
+            "name": "setBytes3",
+            "outputs": [
+                {
+                    "internalType": "bytes3",
+                    "name": "_bytes3Value",
+                    "type": "bytes3"
+                }
+            ],
+            "stateMutability": "pure",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "enum UnitTestToken.Color",
+                    "name": "enumColorValue",
+                    "type": "uint8"
+                }
+            ],
+            "name": "setColor",
+            "outputs": [
+                {
+                    "internalType": "enum UnitTestToken.Color",
+                    "name": "_enumColorValue",
+                    "type": "uint8"
+                }
+            ],
+            "stateMutability": "pure",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "_github",
+                    "type": "string"
+                }
+            ],
+            "name": "setGithub",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "int256",
+                    "name": "intValue",
+                    "type": "int256"
+                }
+            ],
+            "name": "setInt",
+            "outputs": [
+                {
+                    "internalType": "int256",
+                    "name": "_intValue",
+                    "type": "int256"
+                }
+            ],
+            "stateMutability": "pure",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "stringValue",
+                    "type": "string"
+                }
+            ],
+            "name": "setString",
+            "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "_stringValue",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "pure",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "string",
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "age",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "enum UnitTestToken.Color",
+                            "name": "favoriteColor",
+                            "type": "uint8"
+                        }
+                    ],
+                    "internalType": "struct UnitTestToken.Person",
+                    "name": "structPerson",
+                    "type": "tuple"
+                }
+            ],
+            "name": "setStruct",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "string",
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "age",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "enum UnitTestToken.Color",
+                            "name": "favoriteColor",
+                            "type": "uint8"
+                        }
+                    ],
+                    "internalType": "struct UnitTestToken.Person",
+                    "name": "_structPerson",
+                    "type": "tuple"
+                }
+            ],
+            "stateMutability": "pure",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "uintValue",
+                    "type": "uint256"
+                }
+            ],
+            "name": "setUint",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "_uintValue",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "pure",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint8",
+                    "name": "uint8Value",
+                    "type": "uint8"
+                }
+            ],
+            "name": "setUint8",
+            "outputs": [
+                {
+                    "internalType": "uint8",
+                    "name": "_uint8Value",
+                    "type": "uint8"
+                }
+            ],
+            "stateMutability": "pure",
             "type": "function"
         },
         {
@@ -633,6 +895,6 @@
     "chainIds": [
         "0x61"
     ],
-    "timestamp": 1726826946725,
-    "hash": "0x83f6ce14e21c30fe4e2cbe028263d07ed29d34910ae9855445683887d7d2c263"
+    "timestamp": 1727003724720,
+    "hash": "0x1f1e8643e288ecb9d6f7ec49dbfb3c7242b201c00e58b8629be1b12728f69e90"
 }

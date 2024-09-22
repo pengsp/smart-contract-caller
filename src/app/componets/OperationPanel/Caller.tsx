@@ -1,33 +1,36 @@
-import { Button, Empty, Form, Input } from "antd"
+
 import { useCallback, useEffect, useState } from "react"
+import { isAddress, isBytesLike, parseEther, zeroPadBytes } from "ethers"
+import { Decoder } from "ts-abi-decoder";
+import { Button, Empty, Form, Input, InputNumber, Radio, Typography } from "antd"
+import { defaultContract } from "@/constants"
+import { Log, EventItem, FunctionItem } from "@/types"
+import { stringifyReplacer } from "@/utils"
 import ConnectWalletBtn from "../Connection/ConnectWalletBtn"
 import { useWeb3React } from "@web3-react/core"
 import { useContract } from "@/hooks/useContract"
 import InfoItem from "./InfoItem"
 import Params from "./ParamsItem"
 import Card from "../Layout/Card"
-import { defaultContract } from "@/constants"
-import { Log, EventItem } from "@/types"
-import { stringifyReplacer } from "@/utils"
-import { isAddress, parseEther } from "ethers"
-import { Decoder } from "ts-abi-decoder";
 import { networks } from "@/configs"
 import NetworkSwitchBtn from "../Connection/NetworkSwitchBtn"
 import { FunctionRender } from "./Logs"
+import { CloseCircleOutlined } from "@ant-design/icons";
 
+const { Paragraph, Text } = Typography;
+const ETH_INPUT_NAME = "__ETH__";
 export default function Caller({ contract, functionInfo, updateLogs }: {
     contract: Record<string, any> | null,
-    functionInfo: Record<string, any> | null | undefined,
+    functionInfo: FunctionItem | undefined | null,
     updateLogs: (log: any) => void
 }) {
     const { account, chainId, connector, provider } = useWeb3React()
     const { abi, name, hash, address, chainIds } = contract || defaultContract;
-    const [callFunctionData, setCallFunctionData] = useState<any>()
-    const [callInputs, setCallInputs] = useState<any[]>([])
     const [isLogined, setIsLogined] = useState(false)
     const [loading, setLoading] = useState<boolean>(false);
     const params = functionInfo?.inputs
-    Decoder.addABI(abi)
+    const paramTypes = functionInfo?.inputs.map((item) => item.type) || []
+
     const currentNetwork = networks.find(network => Number(network.chainId) == Number(chainId))
     const nativeCurrency = currentNetwork?.nativeCurrency.symbol;
     const explorer = currentNetwork?.blockExplorerUrls[0]
@@ -35,14 +38,14 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
     const [callFunctionForm] = Form.useForm();
     const [networkSupportCheck, setNetworkSupportCheck] = useState(false)
 
+    Decoder.addABI(abi)
+
     useEffect(() => {
         setIsLogined(account ? true : false)
     }, [account])
     useEffect(() => {
         setLoading(false)
         callFunctionForm.resetFields()
-        setCallFunctionData('')
-        setCallInputs([])
     }, [functionInfo])
     useEffect(() => {
         if (chainIds.length == 0) {
@@ -55,16 +58,9 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
         }
     }, [chainId, chainIds])
 
-    const updateCallFunctionData = (event: any) => {
-        const input = event.currentTarget.value
-        setCallFunctionData(input)
-    }
-    const updateCallInputs = useCallback((value: any, index: number) => {
-        const _callInputs = [...callInputs]
-        _callInputs[index] = value
-        setCallInputs([..._callInputs])
-    }, [callInputs])
+
     const callFunction = useCallback(() => {
+
         callFunctionForm.validateFields().then(async () => {
             setLoading(true)
             if (contract && functionInfo) {
@@ -74,9 +70,28 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                     stateMutability,
                     explorer,
                 } as Log
+                const formData = callFunctionForm.getFieldsValue({
+                    strict: true, filter: (meta) => meta.name[0] != ETH_INPUT_NAME
+                })
+                console.log('formData', formData)
+                const callData = Object.values(formData);
+                console.log('paramTypes', paramTypes)
+
+                const args = callData.map((item: any, index: number) => {
+                    const type = paramTypes[index];
+                    //bytes
+                    if (type != 'bytes' && type.startsWith('bytes')) {
+                        const length = parseInt(type.slice(5)) || 0;//[0,32]
+                        return zeroPadBytes(item, length)
+                    } else if (type == 'tuple') {
+                        return JSON.parse(item)
+                    }
+                    return item
+                })
+                console.log('args', args)
                 if (stateMutability === 'view' || stateMutability === 'pure') {
                     try {
-                        const response = await contractInstance![name](...callInputs)
+                        const response = await contractInstance![name](...args)
                         const responseType = typeof response;
                         log.type = "View";
                         if (responseType == 'object') {
@@ -94,23 +109,21 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                     }
 
                 } else if (stateMutability === 'nonpayable' || stateMutability === 'payable') {
-                    log.params = callInputs
+                    log.params = args
                     log.type = "Transaction";
+                    const callValue: any = {};
+                    if (stateMutability === 'payable') {
+                        const ethValue = callFunctionForm.getFieldValue(ETH_INPUT_NAME)
+                        callValue.value = parseEther(ethValue);
+                        log.value = `${ethValue} ${nativeCurrency}`;
+                        console.log('callValue', ethValue, callValue)
+                    }
                     try {
-                        const response = await contractInstance![name](...callInputs, callFunctionData ? { value: parseEther(callFunctionData) } : {})
+                        const response = await contractInstance![name](...args, { ...callValue })
                         console.log('await response', response, response.hash)
                         const hash = response.hash
                         log.hash = hash;
-                        if (stateMutability === 'payable') {
-                            log.value = `${callFunctionData} ${nativeCurrency}`;
-                        }
                         updateLogs(log)
-                        /*
-                            ethers.js v6
-                            if use `await response.wait()` ,will throw an error like `TypeError: receipt.confirmations is not a function`
-                            so instead of `await response.getTransaction()` to get TransactionReceipt 
-                            remark at 2024/09/19 
-                        */
                         const tx = await response.getTransaction()
                         const receipt = await tx.wait()
                         log.isMined = true;
@@ -151,12 +164,16 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
             console.log('validate failed')
         })
 
-    }, [contractInstance, functionInfo, callInputs, updateLogs, callFunctionData])
+    }, [contractInstance, functionInfo, updateLogs])
     return (
         <Card title={functionInfo ? <div className="font-bold text-lg font-mono">
             <FunctionRender name={functionInfo?.name} values={functionInfo.inputs?.map((input: Record<string, any>, index: number) => input.name)} />
+            <span className="text-gray-300 text-xs ml-4 font-sans font-normal">在ABI中的索引位置为 {functionInfo.rawIndex}</span>
         </div> : <>操作面板</>
-        } rootClassName=" h-full flex flex-col overflow" >
+        }
+            rootClassName=" h-full flex flex-col overflow"
+        // extra={<UnitConverter />  }
+        >
             <div className="flex gap-4 h-full overflow-hidden font-mono  box-border pt-4">
                 <div className="bg-gray-50 p-4 px-6 flex flex-col  h-full box-border min-w-64 shrink-0  overflow-auto ">
                     {functionInfo ? <>
@@ -166,7 +183,7 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                         {functionInfo?.outputs.length > 0 && <Params type="outputs" params={functionInfo.outputs} />}
                     </> : <div className="h-full flex flex-col justify-center"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>}
                 </div>
-                <div className=" bg-gray-50 p-4 px-6 grow h-full overflow-auto box-border">
+                <div className=" bg-gray-50 p-4 px-6 grow shrink-0 h-full overflow-auto box-border">
                     <Form
                         name="callFunctionForm"
                         autoComplete="off"
@@ -175,55 +192,24 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                         colon
                         style={functionInfo ? { maxWidth: "500px" } : { height: "100%" }}
                     >
+
+
                         {functionInfo?.stateMutability === "payable" &&
                             <Form.Item
                                 label={`支付${nativeCurrency || ''}数量`}
-                                name="eth"
+                                name={ETH_INPUT_NAME}
                                 rules={[{ required: true, message: `请输入支付的${nativeCurrency || ''}数量` }]}
-                                validateTrigger="onBlur"
+                                validateTrigger={["onBlur", "onChange"]}
                                 className="!mb-2">
                                 <Input
                                     placeholder={`请输入${nativeCurrency || ''}数量`}
                                     key={functionInfo.name}
-                                    value={callFunctionData}
                                     allowClear
-                                    onChange={updateCallFunctionData}
+                                    disabled={loading || !networkSupportCheck}
                                 />
                             </Form.Item>}
+                        {params?.map((input: any, index: number) => <FormItemRender input={input} key={`${input.name}-${index}`} disabled={loading || !networkSupportCheck} />)}
 
-                        {params?.map((input: any, index: number) => {
-                            return <Form.Item
-                                label={input.name || input.internalType}
-                                name={input.name}
-                                key={input.name}
-                                validateTrigger="onBlur"
-                                rules={[{
-                                    validator: (_, value) => {
-                                        if (!value) {
-                                            return Promise.reject(new Error(`${input.name}不能为空`))
-                                        }
-                                        if (input.type == 'address') {
-                                            return isAddress(value) ? Promise.resolve() : Promise.reject(new Error(`checksum 失败，不合法的地址`))
-                                        }
-                                        return Promise.resolve()
-                                    }
-                                }]}
-                                className="!mb-2">
-                                <Input
-                                    key={input.name}
-                                    placeholder={input.type}
-                                    allowClear
-                                    // value={callInputs[index] ? callInputs[index] : ''}
-                                    onClear={() => updateCallInputs('', index)}
-                                    onChange={(event: any) => {
-                                        const input = event.currentTarget.value;
-                                        updateCallInputs(input, index)
-                                    }
-                                    }
-                                />
-                            </Form.Item>
-                        }
-                        )}
                         {functionInfo ?
                             <Form.Item label="" className="!mb-2">
                                 <div className="pt-4">
@@ -240,6 +226,118 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
 
                 </div>
             </div>
-            {/* <div className="h-full flex flex-col justify-center"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div> */}
         </Card>)
 }
+
+function UnitConverter() {
+    const [wei, setWei] = useState<any>(0)
+    const convert = (val: any) => {
+        console.log(val, val ? parseEther(val.toString()) : '')
+        const _wei = val ? parseEther(val.toString()).toString() : 0
+        setWei(_wei)
+    }
+    return (<div className="flex items-center gap-2 text-xs relative -bottom-1">
+        <span>单位换算</span>
+        <div className="relative">
+            <InputNumber addonBefore="ETH" controls={false} type="number" onChange={convert} placeholder="ETH数量" style={{ width: "140px" }} />
+        </div>
+        <span>=</span>
+        <InputNumber type="number" controls={false} addonBefore="Wei" value={wei} style={{ width: "auto" }} readOnly addonAfter={<Text copyable={{ text: wei }} />} />
+    </div>)
+}
+
+function FormItemRender({ input, disabled }: { input: any, disabled: boolean }) {
+    const { type } = input;
+    if (type == 'bool') {
+        return <FormItemRadioButton input={input} disabled={disabled} />;
+    } if (type.startsWith('bytes')) {
+        return <FormItemInput input={input} disabled={disabled} required rules={[{
+            validator: (_: any, value: any) => {
+                if (!value) {
+                    return Promise.reject(new Error(`${input.name}不能为空`))
+                }
+                if (type == 'bytes') {
+                    return isBytesLike(value) ? Promise.resolve() : Promise.reject(new Error(`输入必须是以 0x 开头`))
+                } else {
+                    const length = parseInt(type.slice(5)) || 0;//[0,32]
+                    const expectedLength = length * 2 + 2;
+                    return isBytesLike(value) && value.length <= expectedLength ? Promise.resolve() : Promise.reject(new Error(`输入必须是以 0x 开头,长度小于等于${expectedLength}`))
+                }
+            }
+        }]} />;
+    } else if (type == 'address') {
+        return <FormItemInput input={input} disabled={disabled} required rules={[{
+            validator: (_: any, value: any) => {
+                if (!value) {
+                    return Promise.reject(new Error(`${input.name}不能为空`))
+                }
+                return isAddress(value) ? Promise.resolve() : Promise.reject(new Error(`checksum失败,请输入一个合法的address`))
+            }
+
+        }]} />
+    } else if (type == 'tuple') {
+        return <FormItemArea input={input} disabled={disabled} rules={[{
+            validator: (_: any, value: any) => {
+                if (!value) {
+                    return Promise.reject(new Error(`${input.name}不能为空1`))
+                }
+                try {
+                    const json = JSON.parse(value)
+                    console.log('json', json)
+
+                    return typeof (json) == 'object' ? Promise.resolve() : Promise.reject(new Error(`数据格式不正确`))
+                } catch (e) {
+                    return Promise.reject(new Error(`数据格式不正确`))
+                }
+            }
+        }]} />
+    } else {
+        return <FormItemInput input={input} disabled={disabled} />;
+    }
+}
+
+function FormItemRadioButton({ input, disabled, rules }: { input: any, disabled: boolean, rules?: any[] }) {
+    return <Form.Item
+        label={input.name || input.internalType}
+        name={input.name}
+        rules={[{ required: true, message: '必须选一个值' }]}
+        className="!mb-2"
+    >
+        <Radio.Group buttonStyle="solid" disabled={disabled}>
+            <Radio.Button value={true}>True</Radio.Button>
+            <Radio.Button value={false}>False</Radio.Button>
+        </Radio.Group>
+    </Form.Item>
+}
+function FormItemInput({ input, disabled, required, rules }: { input: any, disabled: boolean, required?: boolean, rules?: any[] }) {
+    const { name, type, internalType } = input
+    return <Form.Item
+        label={name}
+        name={name}
+        rules={rules || [{ required: true, message: `${input.name}不能为空` }]}
+        required={required}
+        className="!mb-2"
+    >
+        <Input
+            key={name}
+            name={name}
+            placeholder={type.startsWith('bytes') ? `${type}:16进制数字,以0x开头` : type}
+            allowClear
+            disabled={disabled}
+        />
+    </Form.Item>
+}
+function FormItemArea({ input, disabled, rules }: { input: any, disabled: boolean, rules?: any[] }) {
+    return <Form.Item
+        label={input.name || input.internalType}
+        name={input.name}
+        rules={rules || [{ required: true, message: '不能为空' }]}
+        className="!mb-2"
+    >
+        <Input.TextArea rows={4}
+            disabled={disabled}
+            allowClear
+        />
+    </Form.Item>
+}
+

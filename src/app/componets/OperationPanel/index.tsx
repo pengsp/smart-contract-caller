@@ -1,6 +1,6 @@
 "use client"
 import { LocalStorageContracts, LocalStorageCurrentContract } from "@/constants";
-import { Contract, EventLog, TransactionLog, Log } from "@/types";
+import { Contract, EventLog, TransactionLog, Log, FunctionItem } from "@/types";
 import { useLocalStorageState } from "ahooks";
 import { useCallback, useEffect, useState } from "react";
 import Functions from "./Functions";
@@ -27,7 +27,7 @@ export default function OperationPanel() {
         },
     );
     const [contract, setContract] = useState<Contract | null>(null)
-    const [currentFunction, setCurrentFunction] = useState<Record<string, any> | null>()
+    const [currentFunction, setCurrentFunction] = useState<FunctionItem | null | undefined>()
     const [logs, setLogs] = useState<Log[]>([])
     useEffect(() => {
         if (currentContractHash && localContracts) {

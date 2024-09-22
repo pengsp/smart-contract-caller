@@ -1,4 +1,4 @@
-import { Contract } from "@/types";
+import { Contract, FunctionItem } from "@/types";
 import { Empty, Select, Skeleton } from "antd";
 import { useEffect, useState } from "react";
 import Card from "../Layout/Card";
@@ -6,11 +6,12 @@ import classes from "./functions.module.scss";
 import { defaultContract } from "@/constants";
 
 
-export default function Functions({ contract, select }: { contract: Contract | null, select: (functionItem: Record<string, any> | null) => void }) {
+export default function Functions({ contract, select }: { contract: Contract | null, select: (functionItem: FunctionItem) => void }) {
     const { abi = [], name = '', hash = '', address = '' } = contract || defaultContract;
-    const [currentFunction, setCurrentFunction] = useState<Record<string, any> | null>(null)
+    const [currentFunction, setCurrentFunction] = useState<FunctionItem | null>(null)
     const [pageLoading, setPageLoading] = useState(true)
-    const functions = abi.filter((item: any) => {
+    const functions: any = abi.filter((item: any, index: number) => {
+        item.rawIndex = index;
         if (item.name && item.type === 'function') {
             item.value = item.name;
             item.label = item.name;
@@ -48,7 +49,7 @@ export default function Functions({ contract, select }: { contract: Contract | n
                 {pageLoading ? Array(10).fill(1).map((_, index) => <div key={index}><Skeleton.Button active size="small" block className="mb-1" /></div>)
                     : (functions.length > 0 ? functions.map((item: any, index: number) => {
                         return <div key={`${item.name}-${index}`} className={currentFunction?.name === item.name ? classes.current : classes.item} onClick={() => selectFunction(item)}>
-                            <span className={classes.index}> {index + 1}:</span>  {item.name}({item.inputs.length > 0 ? item.inputs.length : ''})
+                            <span className={classes.index}> {index + 1}:</span>{item.name}({item.inputs.length > 0 ? item.inputs.length : ''})
                         </div>
 
                     }) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />)

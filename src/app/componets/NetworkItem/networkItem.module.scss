@@ -1,5 +1,5 @@
 .network_item {
-    @apply flex gap-3 border relative p-2 px-3 items-center rounded cursor-pointer;
+    @apply flex gap-3 border relative p-2 px-3 items-center rounded cursor-pointer bg-white;
 
     &:hover {
         @apply border-blue-400;
