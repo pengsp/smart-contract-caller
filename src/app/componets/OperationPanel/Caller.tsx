@@ -168,7 +168,7 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
     return (
         <Card title={functionInfo ? <div className="font-bold text-lg font-mono">
             <FunctionRender name={functionInfo?.name} values={functionInfo.inputs?.map((input: Record<string, any>, index: number) => input.name)} />
-            <span className="text-gray-300 text-xs ml-4 font-sans font-normal">在ABI中的索引位置为 {functionInfo.rawIndex}</span>
+            <span className="text-gray-400 text-xs ml-4 font-sans font-normal">在ABI中的位置索引为 {functionInfo.rawIndex}</span>
         </div> : <>操作面板</>
         }
             rootClassName=" h-full flex flex-col overflow"

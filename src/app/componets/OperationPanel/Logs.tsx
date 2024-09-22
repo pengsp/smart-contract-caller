@@ -14,7 +14,7 @@ export default function Logs({ logs, clearLogs }: { logs: Log[], clearLogs: () =
             logsRef?.current?.scrollTo({ top: logsRef?.current.scrollHeight, behavior: 'smooth' });
         }
     }, [logsRef, logs.length])
-    return <Card title={<div>Logs<span className="text-xs text-orange-400 ml-2" >JSON不支持 bigint,所以log中的 bigint 都会转为 string 展示</span></div>}
+    return <Card title={<div>Logs<span className="text-xs text-orange-400 ml-2 font-mono" >JSON不支持 bigint, bigint 会转为 string 展示</span></div>}
         extra={<Button icon={<ClearOutlined />} onClick={clearLogs} size="small">清除Logs</Button>}
         rootClassName="h-full flex flex-col" >
         <div className="py-4 text-xs whitespace-normal break-all h-full overflow-auto  box-border " ref={logsRef}>
