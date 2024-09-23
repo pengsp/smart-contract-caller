@@ -8,8 +8,6 @@ import Caller from "./Caller";
 import Logs from "./Logs";
 import dayjs from "dayjs";
 
-import UTT_INIT_DATA from "../../../configs/UTT-init-data.json"
-const INIT_TEST_CONTRACT = process.env.NEXT_PUBLIC_INIT_TEST_CONTRACT === "true" ? true : false
 
 export default function OperationPanel() {
     const [localContracts, setLocalContracts] = useLocalStorageState<Contract[]>(
@@ -47,16 +45,6 @@ export default function OperationPanel() {
         setLogs([])
     }, [logs])
 
-    /*  initialize the test contract*/
-    useEffect(() => {
-        if (INIT_TEST_CONTRACT && localContracts) {
-            const checkInitStatus = localContracts?.find(contract => contract.hash == UTT_INIT_DATA.hash)
-            if (!checkInitStatus) {
-                setLocalContracts([...localContracts, UTT_INIT_DATA])
-                setCurrentContractHash(UTT_INIT_DATA.hash)
-            }
-        }
-    }, [localContracts])
     return (<>
         <div className="flex gap-4 h-full overflow-hidden">
             <Functions contract={contract} select={(functionItem) => setCurrentFunction(functionItem)} />

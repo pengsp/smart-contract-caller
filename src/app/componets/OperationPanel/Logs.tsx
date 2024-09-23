@@ -47,7 +47,9 @@ function TransactionWait({ log }: { log: TransactionLog }) {
                 </div>
                 <div>
                     {log.hash && <div>
-                        <a href={`${log.explorer}tx/${log.hash}`} target="_blank" title="在区块浏览器查看" className="text-blue-400 underline hover:text-orange-500">{log.hash}</a> | 等待确认...
+                        {log.explorer
+                            ? <a href={`${log.explorer}tx/${log.hash}`} target="_blank" title="在区块浏览器查看" className="text-blue-400 underline hover:text-orange-500">{log.hash}</a>
+                            : log.hash} | 等待确认...
                     </div>}
                     <div> {(log.result && typeof (log.result) == 'object') ? <LazyReactJson src={log.result} name={false} /> : log.result}</div>
                     {log.error && <div className="text-red-400">{log.error.toString()}</div>}
@@ -60,7 +62,11 @@ function TransactionWait({ log }: { log: TransactionLog }) {
 function TransactionMined({ log }: { log: TransactionLog }) {
     return (<div className="flex gap-1 mb-1">
         <span className="text-gray-400 shrink-0">[{log.createdAt}]</span>
-        <div><a href={`${log.explorer}tx/${log.hash}`} target="_blank" title="在区块浏览器查看" className="text-blue-400 underline hover:text-orange-500">{log.hash}</a> | 已确认!</div>
+        <div>
+            {log.explorer
+                ? <a href={`${log.explorer}tx/${log.hash}`} target="_blank" title="在区块浏览器查看" className="text-blue-400 underline hover:text-orange-500">{log.hash}</a>
+                : log.hash}  | 已确认!
+        </div>
     </div>)
 }
 function Event({ log }: { log: EventLog }) {

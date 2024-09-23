@@ -9,8 +9,6 @@ import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { useLocalStorageState } from "ahooks";
 import { defaultContract, LocalStorageContracts, LocalStorageCurrentContract } from "@/constants";
 const LazyReactJson = lazy(() => import("react-json-view"))
-import UTT_INIT_DATA from "../../../configs/UTT-init-data.json"
-const INIT_TEST_CONTRACT = process.env.NEXT_PUBLIC_INIT_TEST_CONTRACT === "true" ? true : false
 const { Paragraph } = Typography;
 
 export default function ContractInfo({ edit }: { edit: (contract: Contract) => void }) {
@@ -64,6 +62,7 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
             setContract(null)
         }
     }, [localContracts, currentContractHash])
+
     const explorerLinks = useMemo(() => {
         if (contract && contract.chainIds && contract.chainIds.length > 0) {
             return contract.chainIds.map(chainId => {
@@ -73,6 +72,7 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
             return null
         }
     }, [contract])
+
     const contractItems = useMemo(() => {
         const { abi, name, hash, address, timestamp } = contract || defaultContract;
         const updateAt = timestamp ? new Date(timestamp).toLocaleString() : "-"
@@ -118,7 +118,7 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
                             onConfirm={() => actionDeleteContract(contract?.hash)}
                             okText="确定"
                             cancelText="取消"
-                        >    <Button danger size="small" icon={<DeleteOutlined />} disabled={!hash || (!!hash && UTT_INIT_DATA.hash == hash)} >删除合约</Button>
+                        >    <Button danger size="small" icon={<DeleteOutlined />} disabled={!hash} >删除合约</Button>
                         </Popconfirm>
                     </div>
 
@@ -126,6 +126,7 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
         ]
 
     }, [contract, pageLoading]);
+
     useEffect(() => {
         setPageLoading(false)
     }, [])

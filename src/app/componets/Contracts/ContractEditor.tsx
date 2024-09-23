@@ -1,14 +1,15 @@
 "use client"
 
-import { forwardRef, useCallback, useImperativeHandle, useState } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from "react";
 import { hashMessage, isAddress } from "ethers";
-import { networks } from "@/configs";
+import { internalTestContract, networks } from "@/configs";
 import { Button, Checkbox, Form, Input, message, Modal } from "antd";
 import NetworkItem from "../NetworkItem";
 import classes from "./contracts.module.scss"
 import { Contract, Network } from "@/types";
 import { useLocalStorageState } from "ahooks";
-import { LocalStorageContracts } from "@/constants";
+import { LocalStorageContracts, LocalStorageCurrentContract } from "@/constants";
+import { UngroupOutlined } from "@ant-design/icons";
 
 export interface ContractEditorRef {
     showContractEditor: (contract?: Contract) => void;
@@ -18,6 +19,7 @@ const ContractEditor = forwardRef(function ContractEditor(props, ref) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedChainids, setSelectedChainids] = useState<string[]>([])
     const [contractHash, setContractHash] = useState<string | undefined | null>()
+    const [internalTestContractAdded, setInternalTestContract] = useState(true)
     const [contracts, setContracts] = useLocalStorageState<Contract[]>(
         LocalStorageContracts,
         {
@@ -25,12 +27,22 @@ const ContractEditor = forwardRef(function ContractEditor(props, ref) {
             listenStorageChange: true
         },
     );
+
+    const [currentContractHash, setCurrentContractHash] = useLocalStorageState<string | undefined | null>(
+        LocalStorageCurrentContract,
+        {
+            defaultValue: '',
+            listenStorageChange: true
+        },
+    );
+
     const initialValues = {
         name: '',
         address: '',
         abi: "",
         chainIds: []
     }
+
     useImperativeHandle(ref, () => {
         return {
             showContractEditor: (contract: Contract) => initContractEditor(contract)
@@ -104,13 +116,26 @@ const ContractEditor = forwardRef(function ContractEditor(props, ref) {
             const hash = hashMessage(`${timestamp}`)
             _contracts.unshift({ ...contractInfo, hash })
             setContracts(_contracts)
+            setCurrentContractHash(hash)
         }
         addContractCallback()
         setIsModalOpen(false)
     }, [contracts, contractHash, selectedChainids]);
+
+    const addInternalContract = useCallback(() => {
+        const _contracts = contracts || []
+        setContracts([internalTestContract, ..._contracts])
+        setCurrentContractHash(internalTestContract.hash)
+        setIsModalOpen(false)
+    }, [contracts])
+
+    useEffect(() => {
+        const isExisting = contracts?.find(contract => contract.hash == internalTestContract.hash) || false
+        setInternalTestContract(isExisting ? true : false)
+    }, [contracts])
     return (<>
         {contextHolder}
-        <Modal title={contractHash ? "编辑合约" : "新增合约"} open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={null} maskClosable={false} width={800}>
+        <Modal title={contractHash ? "编辑合约" : "新增合约"} open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={null} maskClosable={false} width={800} centered zIndex={102}>
             <Form
                 name={contractHash ? 'edit_form' : 'add_form'}
                 autoComplete="off"
@@ -151,9 +176,9 @@ const ContractEditor = forwardRef(function ContractEditor(props, ref) {
                     name="chains"
                 >
                     <div>
-                        <div className="mb-3 text-gray-400">
-                            <div>若选择了网络则合约调用的时候会判断网络是否匹配，不选则合约调用的时候不做网络判断</div>
-                            <div>如果合约以同一个合约地址部署到多个网络上，那么你可以把对应的网络都选上</div>
+                        <div className="mb-3 text-orange-400">
+                            <div>若选择了网络则合约调用的时候会判断网络是否匹配，若你添加的合约部署的网络不在下面的列表中不选即可。</div>
+                            <div>如果合约以同一个合约地址部署到多个网络上，那么你可以把对应的网络都选上。</div>
                         </div>
                         <div className={classes.networks_wrap}>
                             {networks.map((network: Network) => {
@@ -191,13 +216,21 @@ const ContractEditor = forwardRef(function ContractEditor(props, ref) {
                 </Form.Item>
 
                 <Form.Item >
-                    <div className="flex gap-5 justify-end">
-                        <Button onClick={reset}>
-                            重置
-                        </Button>
-                        <Button type="primary" htmlType="submit">
-                            提交
-                        </Button>
+                    <div className="flex gap-5 justify-between">
+                        {internalTestContractAdded
+                            ? <div></div>
+                            : <Button icon={<UngroupOutlined />} onClick={addInternalContract}>
+                                使用系统内置测试合约
+                            </Button>
+                        }
+                        <div>
+                            <Button onClick={reset}>
+                                重置
+                            </Button>
+                            <Button type="primary" htmlType="submit" className="ml-4">
+                                提交
+                            </Button>
+                        </div>
                     </div>
                 </Form.Item>
             </Form>
