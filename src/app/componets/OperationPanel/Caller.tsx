@@ -219,7 +219,7 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                                         </Button>
                                             {!networkSupportCheck && <NetworkSwitchBtn supportedChainids={chainIds} />}
                                         </>
-                                        : <ConnectWalletBtn danger block />}
+                                        : <ConnectWalletBtn danger type="primary" />}
                                 </div>
                             </Form.Item> : <div className="h-full flex flex-col justify-center"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>}
                     </Form>

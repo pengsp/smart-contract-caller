@@ -28,7 +28,7 @@ export default function ConnectWalletBtn(props: { [propName: string]: any }) {
         }
     }, [connector])
     return (<>
-        <Button onClick={login} type="primary" {...props} >Connect MetaMask</Button>
+        <Button onClick={login}  {...props} ><IconMetaMask className="w-6 h-6" />Connect MetaMask</Button>
         <Modal title="" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={null}>
             <div className="flex flex-col justify-center items-center gap-6 my-6">
                 <IconMetaMask className="w-28 h-28" />
