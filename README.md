@@ -28,8 +28,9 @@
 <img src="./docs/images/screenshot.png" alt="工具界面截图" width="100%" height="auto">
 
 
-## 自行部署
+## 开发
 
+相关命令根据你的包管理工具自行替换
 
 ### 安装依赖 
 ```bash
@@ -49,6 +50,21 @@ yarn build
 ```
 yarn start
 ```
+默认开启了Next.js的`standalone`模式，参考文档：[Automatically Copying Traced Files](https://nextjs.org/docs/pages/api-reference/next-config-js/output#automatically-copying-traced-files)
+
+## Docker部署
+
+### 编译
+```bash
+docker build -t smart-contract-caller .
+```
+
+### 运行
+
+```bash
+docker run -d -p 3000:3000 smart-contract-caller
+```
+
 ### 配置支持的网络
 支持的网络列表配置在文件`/src/configs/networks.ts`   
 参数类型(EIP-3085)
@@ -68,24 +84,18 @@ interface Network {
 ```
 
 ### 初始化测试合约配置
-项目自带了一个`ERC20`测试合约的ABI，此合约包含ERC20标准的方法外，还添加了接收各种类型数据的方法用于测试工具对数据的校验和解析是否正确，可通过`.env`配置是否加载
-```shell
-NEXT_PUBLIC_INIT_TEST_CONTRACT=true # true为加载测试合约
-```
-初始数据配置文件位置：`/src/configs/UTT-init-data.json`   
-可根据需要修改为自己的合约   
+项目`public`目录内有一个`init-contract.json`文件，此文件合约ABI包含ERC20标准的方法以及一些接收各种类型数据的方法，用于测试工具对数据的校验和解析是否正确,可根据需要修改为自己的合约   
 参数类型如下
 ```js
-interface Contract {
+interface BaseContract {
     name: string, // 合约的备注名称
     address: string,//合约地址
-    hash: string,// hash = hashMessage(`${timestamp}`)
     chainIds: string[],// 
     abi: Record<string, any>[],//合约的ABI，它应该是一个数组
-    timestamp: number//时间戳，用来标记合约的更新时间
+    remark:string
 }
 ```
-参数里的`hash`字段仅用来作为唯一索引，可以是任何string，只要确保不会被后面新增合约的时候碰撞到即可，正常流程新增合约的时候它是通过 ethers.hashMessage(\`${timestamp}\`)生成，生成之后编辑合约也不会变化。
+
 
 ### 数据存储说明
 - 合约信息存储在浏览器的`localStorage`里，页面刷新不会丢失
