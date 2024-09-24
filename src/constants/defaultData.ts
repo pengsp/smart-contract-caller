@@ -1,1 +1,1 @@
-export const defaultContract = { abi: [], name: '', hash: '', address: '', chainIds: [], timestamp: 0 }
+export const defaultContract = { abi: [], name: '', hash: '', address: '', chainIds: [], timestamp: 0, remark: '' }

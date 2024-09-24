@@ -3,64 +3,36 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { Button, Select, Skeleton, Tag } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { useLocalStorageState } from 'ahooks';
 import classes from "./contracts.module.scss"
 import { Contract } from "@/types";
-import { LocalStorageContracts, LocalStorageCurrentContract } from "@/constants";
 import { networks } from "@/configs";
+import { useContractManager } from "@/hooks";
 
 export default function ContractList({ add }: { add: () => void }) {
     const [pageLoading, setPageLoading] = useState(true)
 
-    const [contracts, setContracts] = useState<Contract[] | undefined>()
-    const [currentContractHash, setCurrentContractHash] = useState<string | undefined | null>(null)
-    const [localContracts, setLocalContracts] = useLocalStorageState<Contract[]>(
-        LocalStorageContracts,
-        {
-            defaultValue: [],
-            listenStorageChange: true
-        },
-    );
-    const [defaultContractHash, setDefaultContractHash] = useLocalStorageState<string | undefined | null>(
-        LocalStorageCurrentContract,
-        {
-            defaultValue: '',
-            listenStorageChange: true
-        },
-    );
+    const { localContracts, contractsCount, currentContractHash, setCurrentContractHash } = useContractManager()
 
-    const selectContract = (hash: string) => {
-        setCurrentContractHash(hash)
-        setDefaultContractHash(hash)
-    }
     useEffect(() => {
-        // fix hydration error
-        setContracts(localContracts)
         setPageLoading(false)
-    }, [localContracts])
-
-    useEffect(() => {
-        setCurrentContractHash(defaultContractHash || null)
-    }, [defaultContractHash])
+    }, [])
 
     const onChange = (value: string) => {
-        console.log(`selected ${value}`);
-        selectContract(value)
+        setCurrentContractHash(value)
     };
 
     const onSearch = (value: string) => {
-        console.log('search:', value);
+        // console.log('search:', value);
     };
     const options = useMemo(() => {
-        const list = contracts?.map((contract: Contract, index: number) => {
+        const list = localContracts?.map((contract: Contract, index: number) => {
             const option: any = { ...contract }
             option.value = contract.hash
             option.label = contract.name
             return option
         })
-        // console.log('list', list)
         return list;
-    }, [contracts])
+    }, [localContracts])
     return (
         <>{pageLoading
             ? <div className="flex items-center gap-2 justify-between border-b pb-4">
@@ -69,16 +41,16 @@ export default function ContractList({ add }: { add: () => void }) {
 
             </div>
             : <div className="flex items-center gap-2 justify-between border-b pb-4">
-                {contracts && contracts.length > 0 ? <div className="flex items-center gap-4">
+                {contractsCount > 0 ? <div className="flex items-center gap-4">
                     <span>选择合约</span>
                     <Select
                         showSearch
-                        placeholder="选择合约"
+                        placeholder={`共${contractsCount}条记录，请选择合约`}
                         optionFilterProp="label"
                         onChange={onChange}
                         onSearch={onSearch}
                         style={{ width: "380px" }}
-                        value={currentContractHash}
+                        value={currentContractHash || null}
 
                         optionRender={(option: any) => {
                             const contract = option.data;

@@ -46,7 +46,7 @@ export default function Functions({ contract, select }: { contract: Contract | n
                 dropdownStyle={{ border: 0 }}
             />
             <div className={classes.root}>
-                {pageLoading ? Array(10).fill(1).map((_, index) => <div key={index}><Skeleton.Button active size="small" block className="mb-1" /></div>)
+                {pageLoading ? <FunctionListSkeleton />
                     : (functions.length > 0 ? functions.map((item: any, index: number) => {
                         return <div key={`${item.name}-${index}`} className={currentFunction?.name === item.name ? classes.current : classes.item} onClick={() => selectFunction(item)}>
                             <span className={classes.index}> {index + 1}:</span>{item.name}({item.inputs.length > 0 ? item.inputs.length : ''})
@@ -56,4 +56,10 @@ export default function Functions({ contract, select }: { contract: Contract | n
                 }
             </div>
         </Card>)
+}
+
+function FunctionListSkeleton() {
+    return (<>
+        {[80, 60, 95, 80, 70, 100, 80, 60, 70, 90, 60, 95, 40,].map((w, index) => <div key={index} style={{ width: `${w}%` }}><Skeleton.Button active size="small" block className="mb-1" /></div>)}
+    </>)
 }

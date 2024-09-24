@@ -1,85 +1,55 @@
 "use client"
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Button, Modal } from "antd";
-import { useLocalStorageState } from "ahooks";
+import { useRef } from "react";
 import { Contract } from "@/types";
-import ContractEditor, { ContractEditorRef } from "../Contracts/ContractEditor";
-import { LocalStorageContracts, LocalStorageCurrentContract } from "@/constants";
 import ContractList from "./ContractList";
 import ContractInfo from "./ContractInfo";
-import { PlusOutlined, UngroupOutlined } from "@ant-design/icons";
-import { internalTestContract } from "@/configs";
+import ContractModal, { ContractModalRef } from "./ContractModal";
 
 
 export default function Contracts() {
-    const contractEditorRef = useRef<ContractEditorRef>(null)
-    const [localContracts, setLocalContracts] = useLocalStorageState<Contract[]>(
-        LocalStorageContracts,
-        {
-            defaultValue: [],
-            listenStorageChange: true
-        },
-    );
-    const [currentContractHash, setCurrentContractHash] = useLocalStorageState<string | undefined | null>(
-        LocalStorageCurrentContract,
-        {
-            defaultValue: '',
-            listenStorageChange: true
-        },
-    );
-
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const handleOk = () => {
-        setIsModalOpen(false);
-    };
-
-    const handleCancel = () => {
-        setIsModalOpen(false);
-    };
-
-    const [contract, setContract] = useState<Contract | null>(null)
+    const contractModalRef = useRef<ContractModalRef>(null)
 
     const actionAddContract = () => {
-        contractEditorRef?.current?.showContractEditor()
+        contractModalRef?.current?.showContractModal("manual", undefined)
     };
 
-    const actionEditContract = useCallback(() => {
-        if (contract) {
-            contractEditorRef?.current?.showContractEditor(contract)
-        }
-    }, [contract]);
+    const actionEditContract = (contract: Contract) => {
+        contractModalRef?.current?.showContractModal("manual", contract)
+    };
 
-    const initContract = () => {
-        setLocalContracts([internalTestContract])
-        setCurrentContractHash(internalTestContract.hash)
-        setIsModalOpen(false);
-    }
 
-    useEffect(() => {
-        if (currentContractHash && localContracts) {
-            const target = localContracts.find(contract => contract.hash == currentContractHash);
-            setContract(target || null)
-        } else {
-            setContract(null)
-        }
-    }, [localContracts, currentContractHash])
-
-    useEffect(() => {
-        setIsModalOpen(localContracts && localContracts.length > 0 ? false : true)
-    }, [localContracts])
 
     return (<>
         <ContractList add={actionAddContract} />
         <ContractInfo edit={actionEditContract} />
-        <ContractEditor ref={contractEditorRef} />
-        <Modal title="" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={null} maskClosable={false} closable={false} centered zIndex={100}>
-            <div className="h-52 flex flex-col justify-center text-center gap-6 w-60 mx-auto">
-                <div className="text-orange-500 text-base">当前没有可用的智能合约</div>
-                <Button icon={<UngroupOutlined />} onClick={initContract} size="large">使用系统内置测试合约</Button>
-                <Button icon={<PlusOutlined />} type="primary" onClick={actionAddContract} size="large">新增合约</Button>
+        <ContractModal ref={contractModalRef} />
+        {/* <ContractEditor ref={contractEditorRef} />
+        <BatchAddContractModal ref={batchAddContractModalRef} /> */}
+        {/* <Modal title="" open={isTipsModalOpen} footer={null} maskClosable={false} closable={false} centered zIndex={100}>
+
+            <div className="text-orange-500 text-base mt-2 mb-6">当前没有可用的智能合约,您可以选择以下操作：</div>
+
+            <div className="flex gap-3">
+                <div className="border rounded basis-1/3 p-3 flex flex-col justify-between gap-4">
+                    <div>系统内置了一个测试合约，方便你熟悉工具</div>
+                    <Button icon={<UngroupOutlined />} onClick={initContract} loading={loading}>立即使用</Button>
+                </div>
+
+                <div className="border rounded basis-1/3 p-3  flex flex-col justify-between gap-4">
+                    <div>上传符合数据格式的JSON文件或JSON数据增加合约</div>
+                    <Button icon={<CloudUploadOutlined />} loading={loading} block onClick={actionBatchUploadContract}>立即上传</Button>
+                
+                </div>
+
+                <div className="border rounded basis-1/3 p-3 flex flex-col justify-between gap-4">
+                    <div>
+                        <div>提供合约地址和合约ABI,新增合约</div>
+                    </div>
+                    <Button icon={<PlusOutlined />} type="primary" onClick={actionAddContract} disabled={loading}>新增合约</Button>
+                </div>
             </div>
-        </Modal>
+        </Modal > */}
+
+
     </>)
 }
-

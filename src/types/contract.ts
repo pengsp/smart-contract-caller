@@ -1,10 +1,14 @@
-export interface Contract {
+
+export interface BaseContract {
     name: string,
     address: string,
-    hash: string,
     chainIds: string[],
     abi: Record<string, any>[],
-    timestamp: number
+    remark?: string
+}
+export interface Contract extends BaseContract {
+    hash: string,
+    timestamp: number,
 }
 export interface FunctionItem {
     name: string,

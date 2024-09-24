@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { Button, Dropdown, Modal, Spin } from "antd";
+import { Button, Divider, Dropdown, Modal, Spin } from "antd";
 import type { MenuProps } from 'antd';
 import { useWeb3React } from "@web3-react/core";
 import { useAuth } from "@/hooks/useAuth";
@@ -68,6 +68,7 @@ export default function Connection() {
             ),
         },
     ];
+
     useEffect(() => {
         setIsLogin(account ? true : false)
     }, [account])
@@ -90,7 +91,14 @@ export default function Connection() {
                             <NetworkItem network={network} selected={Number(network.chainId) == Number(chainId)} />
                         </div>
                     })}
+                    <div className=""></div>
                 </div >
+                <Divider />
+                {/* 
+                <div className="">
+                    <div>没有你需要的网络？</div>
+                    <Button onClick={()=>{}}>新增网络</Button>
+                </div> */}
                 <div className="text-right mt-4">
                     <Button onClick={handleCancel}>关闭</Button>
                 </div>

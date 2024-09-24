@@ -6,29 +6,15 @@ import { Button, Descriptions, Empty, Modal, Popconfirm, Skeleton, Tooltip } fro
 import { networks } from "@/configs";
 import { Typography } from 'antd';
 import { DeleteOutlined, EditOutlined, EyeOutlined } from "@ant-design/icons";
-import { useLocalStorageState } from "ahooks";
-import { defaultContract, LocalStorageContracts, LocalStorageCurrentContract } from "@/constants";
+import { defaultContract } from "@/constants";
+import { useContractManager } from "@/hooks";
 const LazyReactJson = lazy(() => import("react-json-view"))
 const { Paragraph } = Typography;
 
 export default function ContractInfo({ edit }: { edit: (contract: Contract) => void }) {
     const [pageLoading, setPageLoading] = useState(true)
+    const { deleteContract, currentContract, setCurrentContractHash } = useContractManager()
 
-    const [localContracts, setLocalContracts] = useLocalStorageState<Contract[]>(
-        LocalStorageContracts,
-        {
-            defaultValue: [],
-            listenStorageChange: true
-        },
-    );
-    const [currentContractHash, setCurrentContractHash] = useLocalStorageState<string | undefined | null>(
-        LocalStorageCurrentContract,
-        {
-            defaultValue: '',
-            listenStorageChange: true
-        },
-    );
-    const [contract, setContract] = useState<Contract | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const showABIModal = () => {
@@ -38,55 +24,47 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
     const handleOk = () => {
         setIsModalOpen(false);
     };
+
     const handleCancel = () => {
         setIsModalOpen(false);
     };
-    const actionDeleteContract = (hash?: string) => {
-        if (contract) {
-            const _localContracts = localContracts?.filter(item => item.hash != hash)
-            console.log(_localContracts)
-            setLocalContracts(_localContracts)
+
+    const actionDeleteContract = (hash: string) => {
+        if (currentContract) {
+            deleteContract(hash)
             setCurrentContractHash('')
         }
     }
+
     const actionEditContract = useCallback(() => {
-        if (contract) {
-            edit(contract)
+        if (currentContract) {
+            edit(currentContract)
         }
-    }, [contract]);
-    useEffect(() => {
-        if (currentContractHash && localContracts) {
-            const target = localContracts.find(contract => contract.hash == currentContractHash);
-            setContract(target || null)
-        } else {
-            setContract(null)
-        }
-    }, [localContracts, currentContractHash])
+    }, [currentContract]);
 
     const explorerLinks = useMemo(() => {
-        if (contract && contract.chainIds && contract.chainIds.length > 0) {
-            return contract.chainIds.map(chainId => {
-                return <BlockExplorerLinks chainId={chainId} contractAddrss={contract.address} key={chainId} />
+        if (currentContract && currentContract.chainIds && currentContract.chainIds.length > 0) {
+            return currentContract.chainIds.map(chainId => {
+                return <BlockExplorerLinks chainId={chainId} contractAddrss={currentContract.address} key={chainId} />
             })
         } else {
             return null
         }
-    }, [contract])
+    }, [currentContract])
 
     const contractItems = useMemo(() => {
-        const { abi, name, hash, address, timestamp } = contract || defaultContract;
+        const { abi, name, hash, address, timestamp, remark } = currentContract || defaultContract;
         const updateAt = timestamp ? new Date(timestamp).toLocaleString() : "-"
 
         return [
-            {
-                key: 'name',
-                label: '合约名称',
-                children: pageLoading ? <div className="w-20"><Skeleton.Button active block size="small" /></div> : name,
-            },
+            // {
+            //     key: 'name',
+            //     label: '合约名称',
+            //     children: pageLoading ? <div className="w-20"><Skeleton.Button active block size="small" /></div> : name,
+            // },
             {
                 key: 'address',
                 label: '合约地址',
-                span: 2,
                 children: pageLoading
                     ? <div className="w-48"><Skeleton.Button active block size="small" /></div>
                     : (address ? <Paragraph copyable={{ text: address }} className="!mb-0">{address}</Paragraph> : '-'),
@@ -100,6 +78,12 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
                 key: 'chains',
                 label: '支持网络',
                 children: pageLoading ? <div className="w-20"><Skeleton.Button active block size="small" /></div> : <div className="flex flex-wrap gap-2">{explorerLinks}</div>,
+                span: 2
+            },
+            {
+                key: 'remark',
+                label: '备注',
+                children: pageLoading ? <div className="w-20"><Skeleton.Button active block size="small" /></div> : remark,
             },
             {
                 key: 'action',
@@ -115,7 +99,7 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
                         <Popconfirm
                             title="删除合约"
                             description="确定删除这个合约?"
-                            onConfirm={() => actionDeleteContract(contract?.hash)}
+                            onConfirm={() => actionDeleteContract(hash)}
                             okText="确定"
                             cancelText="取消"
                         >    <Button danger size="small" icon={<DeleteOutlined />} disabled={!hash} >删除合约</Button>
@@ -125,7 +109,7 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
             },
         ]
 
-    }, [contract, pageLoading]);
+    }, [currentContract, pageLoading]);
 
     useEffect(() => {
         setPageLoading(false)
@@ -137,9 +121,9 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
             items={contractItems}
             className="whitespace-nowrap"
         />
-        <Modal title={`${contract && contract.name} ABI`} open={isModalOpen} onOk={handleOk} width={720} onCancel={handleCancel} footer={null}>
+        <Modal title={`${currentContract && currentContract.name} ABI`} open={isModalOpen} onOk={handleOk} width={720} onCancel={handleCancel} footer={null}>
             <div className="h-[50vh] overflow-auto">
-                {contract ? <LazyReactJson src={contract.abi} name={false} collapsed={2} /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+                {currentContract ? <LazyReactJson src={currentContract.abi} name={false} collapsed={2} /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
             </div>
             <div className="flex justify-end mt-5">
                 <Button type="primary" onClick={handleOk}>确定</Button>

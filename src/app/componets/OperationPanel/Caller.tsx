@@ -73,10 +73,7 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                 const formData = callFunctionForm.getFieldsValue({
                     strict: true, filter: (meta) => meta.name[0] != ETH_INPUT_NAME
                 })
-                console.log('formData', formData)
                 const callData = Object.values(formData);
-                console.log('paramTypes', paramTypes)
-
                 const args = callData.map((item: any, index: number) => {
                     const type = paramTypes[index];
                     //bytes
@@ -88,7 +85,6 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                     }
                     return item
                 })
-                console.log('args', args)
                 if (stateMutability === 'view' || stateMutability === 'pure') {
                     try {
                         const response = await contractInstance![name](...args)
@@ -116,11 +112,9 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                         const ethValue = callFunctionForm.getFieldValue(ETH_INPUT_NAME)
                         callValue.value = parseEther(ethValue);
                         log.value = `${ethValue} ${nativeCurrency}`;
-                        console.log('callValue', ethValue, callValue)
                     }
                     try {
                         const response = await contractInstance![name](...args, { ...callValue })
-                        console.log('await response', response, response.hash)
                         const hash = response.hash
                         log.hash = hash;
                         updateLogs(log)
