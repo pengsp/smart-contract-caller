@@ -1,14 +1,19 @@
 "use client"
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { Button, Select, Skeleton, Tag } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import classes from "./contracts.module.scss"
+import { useTranslations } from "next-intl";
+import { Button, Dropdown, Select, Skeleton, Tag } from "antd";
+import { BlockOutlined, CloudUploadOutlined, FileTextOutlined, PlusOutlined } from "@ant-design/icons";
 import { Contract } from "@/types";
 import { networks } from "@/configs";
 import { useContractManager } from "@/hooks";
+import type { MenuProps } from 'antd';
+import { ViaType } from "./ContractModal";
+import classes from "./contracts.module.scss"
 
-export default function ContractList({ add }: { add: () => void }) {
+export default function ContractList({ add }: { add: (via: ViaType) => void }) {
+    const t = useTranslations();
+
     const [pageLoading, setPageLoading] = useState(true)
 
     const { localContracts, contractsCount, currentContractHash, setCurrentContractHash } = useContractManager()
@@ -33,6 +38,7 @@ export default function ContractList({ add }: { add: () => void }) {
         })
         return list;
     }, [localContracts])
+
     return (
         <>{pageLoading
             ? <div className="flex items-center gap-2 justify-between border-b pb-4">
@@ -42,10 +48,10 @@ export default function ContractList({ add }: { add: () => void }) {
             </div>
             : <div className="flex items-center gap-2 justify-between border-b pb-4">
                 {contractsCount > 0 ? <div className="flex items-center gap-4">
-                    <span>选择合约</span>
+                    <span>{t('select_contract')}</span>
                     <Select
                         showSearch
-                        placeholder={`共${contractsCount}条记录，请选择合约`}
+                        placeholder={t('select_contract_placeholder', { total: contractsCount })}
                         optionFilterProp="label"
                         onChange={onChange}
                         onSearch={onSearch}
@@ -66,8 +72,8 @@ export default function ContractList({ add }: { add: () => void }) {
                         }}
                         options={options}
                     />
-                </div> : <span>请先增加合约</span>}
-                <Button icon={<PlusOutlined />} onClick={add} type="primary">增加合约</Button>
+                </div> : <span>{t('no_contract_found')}</span>}
+                <AddContractBtn action={add} />
             </div>
         }
         </>
@@ -86,4 +92,47 @@ function getChainByChainId(chainId: string) {
             </div>
         </Tag>
     }
+}
+
+export function AddContractBtn({ action }: { action: (via: ViaType) => void }) {
+    const t = useTranslations();
+
+    const handleMenuClick: MenuProps['onClick'] = (e) => {
+        const via = e.key as ViaType
+        action(via)
+    };
+
+    const items: MenuProps['items'] = [{
+        key: '1',
+        type: 'group',
+        label: t('select_via'),
+        children: [{
+            label: t('form_submission'),
+            key: 'form',
+            icon: <FileTextOutlined />,
+        },
+        {
+            label: t('upload_json'),
+            key: 'upload',
+            icon: <CloudUploadOutlined />,
+        },
+        {
+            label: t('paste_json'),
+            key: 'paste',
+            icon: <BlockOutlined />,
+        },]
+    }
+
+    ];
+
+    const menuProps = {
+        items,
+        onClick: handleMenuClick,
+    };
+
+    return (<>
+        <Dropdown menu={menuProps} placement="bottomRight" arrow>
+            <Button icon={<PlusOutlined />} type="primary"> {t('add_contract')}</Button>
+        </Dropdown>
+    </>)
 }

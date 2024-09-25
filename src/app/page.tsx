@@ -3,7 +3,7 @@ import Card from "./componets/Layout/Card";
 import Nav from "./componets/Layout/Nav";
 import OperationPanel from "./componets/OperationPanel";
 
-export default function Home() {
+export default function Page() {
   return (
     <>
       <Nav />

@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { Button, message, Modal, Tabs } from "antd";
-import type { TabsProps } from 'antd';
+import { useTranslations } from "next-intl";
+import { Button, message, Modal } from "antd";
 import { PlusOutlined, UngroupOutlined } from "@ant-design/icons";
 import { Contract } from "@/types";
 import { useContractManager } from "@/hooks";
@@ -8,28 +8,30 @@ import ContractEditor from "./ContractEditor";
 import AddContractByPasteJSON from "./AddContractByPasteJSON";
 import AddContractByUploadJSON from "./AddContractByUploadJSON";
 import JSONDataFormatTips from "./JSONDataFormatTips";
+import { AddContractBtn } from "./ContractList";
 
-type TabKeys = "manual" | "upload" | "paste";
+export type ViaType = "form" | "upload" | "paste";
 export interface ContractModalRef {
-    showContractModal: (key: TabKeys, contract?: Contract) => void;
+    showContractModal: (via: ViaType, contract?: Contract) => void;
 }
 const ContractModal = forwardRef(function ContractModal(props, ref) {
     const [isContractModalOpen, setIsContractModalOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<TabKeys>('manual')
+    const [activeTab, setActiveTab] = useState<ViaType>('form')
     const [messageApi, contextHolder] = message.useMessage();
     const [isTipsModalOpen, setIsTipsModalOpen] = useState(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [contractEditing, setContractEditing] = useState<Contract | undefined>(undefined)
     const { contractsCount, batchAddContract } = useContractManager()
+    const t = useTranslations();
 
     useImperativeHandle(ref, () => {
         return {
-            showContractModal: (key: TabKeys, contract?: Contract) => initContractModal(key, contract)
+            showContractModal: (via: ViaType, contract?: Contract) => initContractModal(via, contract)
         }
     }, [])
 
-    const initContractModal = (key: TabKeys, contract?: Contract) => {
-        setActiveTab(key)
+    const initContractModal = (via: ViaType, contract?: Contract) => {
+        setActiveTab(via)
         setContractEditing(contract || undefined)
         setIsContractModalOpen(true)
     }
@@ -38,37 +40,16 @@ const ContractModal = forwardRef(function ContractModal(props, ref) {
     };
 
     const handleCancel = () => {
-        setActiveTab('manual')
+        setActiveTab('form')
         setIsContractModalOpen(false);
 
     };
     const addContractCallback = (count: number) => {
         messageApi.open({
             type: 'success',
-            content: `成功增加${count}条记录`,
+            content: t('successfully_added_records', { count }),
         });
         setIsContractModalOpen(false);
-    };
-    const items: TabsProps['items'] = [
-
-        {
-            key: 'manual',
-            label: '手动录入',
-            children: null,
-        },
-        {
-            key: 'upload',
-            label: '上传JSON文件',
-            children: null,
-        },
-        {
-            key: 'paste',
-            label: '粘贴JSON数据',
-            children: null,
-        }
-    ];
-    const onTabChange = (key: any) => {
-        setActiveTab(key)
     };
     const initContract = () => {
         setLoading(true)
@@ -82,8 +63,8 @@ const ContractModal = forwardRef(function ContractModal(props, ref) {
             setLoading(false)
         }
     }
-    const actionAddContract = () => {
-        setActiveTab('manual')
+    const actionAddContract = (via: ViaType) => {
+        setActiveTab(via)
         setContractEditing(undefined)
         setIsContractModalOpen(true);
     }
@@ -93,25 +74,23 @@ const ContractModal = forwardRef(function ContractModal(props, ref) {
     return (
         <>
             {contextHolder}
-            <Modal title="" open={isTipsModalOpen} footer={null} maskClosable={false} closable={false} centered zIndex={100}>
-
-                <div className="text-orange-500 text-base mt-2 mb-6">当前没有可用的智能合约,您可以选择以下操作：</div>
+            <Modal title={<div className="text-orange-500 text-base mt-2">{t('no_contract_found')}</div>} open={isTipsModalOpen} footer={null} maskClosable={false} closable={false} centered zIndex={100}>
+                <div className=" text-base my-4">{t('you_can_choose')}</div>
 
                 <div className="flex gap-4">
                     <div className="border rounded basis-1/2 p-4 flex flex-col justify-between gap-6">
-                        <div>系统内置了一个测试合约，方便你熟悉工具</div>
-                        <Button icon={<UngroupOutlined />} onClick={initContract} loading={loading}>立即使用</Button>
+                        <div>{t("choose_1")}</div>
+                        <Button icon={<UngroupOutlined />} onClick={initContract} loading={loading}>{t('try_it')}</Button>
                     </div>
 
                     <div className="border rounded basis-1/2 p-3 flex flex-col justify-between gap-4">
-                        <div>提供合约地址和合约ABI等信息,新增合约</div>
-                        <Button icon={<PlusOutlined />} type="primary" onClick={actionAddContract} disabled={loading}>新增合约</Button>
+                        <div>{t("choose_1")}</div>
+                        <AddContractBtn action={actionAddContract} />
                     </div>
                 </div>
             </Modal >
-            <Modal title={contractEditing ? "编辑合约" : "新增合约"} open={isContractModalOpen} onOk={handleOk} onCancel={handleCancel} footer={null} maskClosable={false} width={800} centered zIndex={102}>
-                {contractEditing ? <div className="h-6"></div> : <Tabs activeKey={activeTab} items={items} onChange={onTabChange} />}
-                {activeTab == 'manual' ? <ContractEditor contract={contractEditing} callback={addContractCallback} handleCancel={handleCancel} /> : <JSONDataFormatTips />}
+            <Modal title={contractEditing ? t('edit_contract') : t('add_contract')} open={isContractModalOpen} onOk={handleOk} onCancel={handleCancel} footer={null} maskClosable={false} width={800} zIndex={102}>
+                {activeTab == 'form' ? <ContractEditor contract={contractEditing} callback={addContractCallback} handleCancel={handleCancel} /> : <JSONDataFormatTips />}
                 {activeTab == 'upload' && <AddContractByUploadJSON callback={addContractCallback} handleCancel={handleCancel} />}
                 {activeTab == 'paste' && <AddContractByPasteJSON callback={addContractCallback} handleCancel={handleCancel} />}
             </Modal>

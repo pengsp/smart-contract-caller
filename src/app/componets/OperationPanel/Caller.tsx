@@ -1,5 +1,6 @@
 
 import { useCallback, useEffect, useState } from "react"
+import { useTranslations } from "next-intl";
 import { isAddress, isBytesLike, parseEther, zeroPadBytes } from "ethers"
 import { Decoder } from "ts-abi-decoder";
 import { Button, Empty, Form, Input, InputNumber, Radio, Typography } from "antd"
@@ -15,17 +16,17 @@ import Card from "../Layout/Card"
 import { networks } from "@/configs"
 import NetworkSwitchBtn from "../Connection/NetworkSwitchBtn"
 import { FunctionRender } from "./Logs"
-import { CloseCircleOutlined } from "@ant-design/icons";
 
-const { Paragraph, Text } = Typography;
+const { Text } = Typography;
 const ETH_INPUT_NAME = "__ETH__";
+
 export default function Caller({ contract, functionInfo, updateLogs }: {
     contract: Record<string, any> | null,
     functionInfo: FunctionItem | undefined | null,
     updateLogs: (log: any) => void
 }) {
-    const { account, chainId, connector, provider } = useWeb3React()
-    const { abi, name, hash, address, chainIds } = contract || defaultContract;
+    const { account, chainId } = useWeb3React()
+    const { abi, address, chainIds } = contract || defaultContract;
     const [isLogined, setIsLogined] = useState(false)
     const [loading, setLoading] = useState<boolean>(false);
     const params = functionInfo?.inputs
@@ -37,16 +38,19 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
     const contractInstance = useContract(address, abi)
     const [callFunctionForm] = Form.useForm();
     const [networkSupportCheck, setNetworkSupportCheck] = useState(false)
+    const t = useTranslations();
 
     Decoder.addABI(abi)
 
     useEffect(() => {
         setIsLogined(account ? true : false)
     }, [account])
+
     useEffect(() => {
         setLoading(false)
         callFunctionForm.resetFields()
     }, [functionInfo])
+
     useEffect(() => {
         if (chainIds.length == 0) {
             setNetworkSupportCheck(true)
@@ -110,7 +114,7 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                     const callValue: any = {};
                     if (stateMutability === 'payable') {
                         const ethValue = callFunctionForm.getFieldValue(ETH_INPUT_NAME)
-                        callValue.value = parseEther(ethValue);
+                        callValue.value = parseEther(ethValue.toString());
                         log.value = `${ethValue} ${nativeCurrency}`;
                     }
                     try {
@@ -159,11 +163,16 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
         })
 
     }, [contractInstance, functionInfo, updateLogs])
+
+    useEffect(() => {
+        setIsLogined(account ? true : false)
+    }, [account])
+
     return (
         <Card title={functionInfo ? <div className="font-bold text-lg font-mono">
             <FunctionRender name={functionInfo?.name} values={functionInfo.inputs?.map((input: Record<string, any>, index: number) => input.name)} />
-            <span className="text-gray-400 text-xs ml-4 font-sans font-normal">在ABI中的位置索引为 {functionInfo.rawIndex}</span>
-        </div> : <>操作面板</>
+            <span className="text-gray-400 text-xs ml-4 font-sans font-normal">{t('indexed_in_abi')} {functionInfo.rawIndex}</span>
+        </div> : <>{t('operation_panel')}</>
         }
             rootClassName=" h-full flex flex-col overflow"
         // extra={<UnitConverter />  }
@@ -190,13 +199,13 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
 
                         {functionInfo?.stateMutability === "payable" &&
                             <Form.Item
-                                label={`支付${nativeCurrency || ''}数量`}
+                                label={t('pay_currency_amount', { currency: nativeCurrency || '' })}
                                 name={ETH_INPUT_NAME}
-                                rules={[{ required: true, message: `请输入支付的${nativeCurrency || ''}数量` }]}
+                                rules={[{ required: true, message: `${t('pay_currency_amount', { currency: nativeCurrency || '' })}${t('is_required')}` }]}
                                 validateTrigger={["onBlur", "onChange"]}
                                 className="!mb-2">
                                 <Input
-                                    placeholder={`请输入${nativeCurrency || ''}数量`}
+                                    placeholder={t('pay_currency_amount', { currency: nativeCurrency || '' })}
                                     key={functionInfo.name}
                                     allowClear
                                     disabled={loading || !networkSupportCheck}
@@ -209,7 +218,7 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                                 <div className="pt-4">
                                     {isLogined
                                         ? <> <Button onClick={callFunction} type="primary" loading={loading} disabled={!networkSupportCheck} >
-                                            {functionInfo?.stateMutability == 'view' ? `查询` : `执行`} {functionInfo?.name}
+                                            {functionInfo?.stateMutability == 'view' ? t('get') : null}  {functionInfo?.name}
                                         </Button>
                                             {!networkSupportCheck && <NetworkSwitchBtn supportedChainids={chainIds} />}
                                         </>
@@ -217,7 +226,6 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                                 </div>
                             </Form.Item> : <div className="h-full flex flex-col justify-center"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>}
                     </Form>
-
                 </div>
             </div>
         </Card>)
@@ -241,6 +249,8 @@ function UnitConverter() {
 }
 
 function FormItemRender({ input, disabled }: { input: any, disabled: boolean }) {
+    const t = useTranslations();
+
     const { type } = input;
     if (type == 'bool') {
         return <FormItemRadioButton input={input} disabled={disabled} />;
@@ -248,14 +258,14 @@ function FormItemRender({ input, disabled }: { input: any, disabled: boolean }) 
         return <FormItemInput input={input} disabled={disabled} required rules={[{
             validator: (_: any, value: any) => {
                 if (!value) {
-                    return Promise.reject(new Error(`${input.name}不能为空`))
+                    return Promise.reject(new Error(`${input.name}${t('is_required')} `))
                 }
                 if (type == 'bytes') {
-                    return isBytesLike(value) ? Promise.resolve() : Promise.reject(new Error(`输入必须是以 0x 开头`))
+                    return isBytesLike(value) ? Promise.resolve() : Promise.reject(new Error(`${t('start_0x')}`))
                 } else {
                     const length = parseInt(type.slice(5)) || 0;//[0,32]
                     const expectedLength = length * 2 + 2;
-                    return isBytesLike(value) && value.length <= expectedLength ? Promise.resolve() : Promise.reject(new Error(`输入必须是以 0x 开头,长度小于等于${expectedLength}`))
+                    return isBytesLike(value) && value.length <= expectedLength ? Promise.resolve() : Promise.reject(new Error(`${t('start_0x_len_le_max', { maxLen: expectedLength })}`))
                 }
             }
         }]} />;
@@ -263,9 +273,9 @@ function FormItemRender({ input, disabled }: { input: any, disabled: boolean }) 
         return <FormItemInput input={input} disabled={disabled} required rules={[{
             validator: (_: any, value: any) => {
                 if (!value) {
-                    return Promise.reject(new Error(`${input.name}不能为空`))
+                    return Promise.reject(new Error(`${input.name}${t('is_required')}`))
                 }
-                return isAddress(value) ? Promise.resolve() : Promise.reject(new Error(`checksum失败,请输入一个合法的address`))
+                return isAddress(value) ? Promise.resolve() : Promise.reject(new Error(t('checksum_failed')))
             }
 
         }]} />
@@ -273,15 +283,15 @@ function FormItemRender({ input, disabled }: { input: any, disabled: boolean }) 
         return <FormItemArea input={input} disabled={disabled} rules={[{
             validator: (_: any, value: any) => {
                 if (!value) {
-                    return Promise.reject(new Error(`${input.name}不能为空1`))
+                    return Promise.reject(new Error(`${input.name}${t('is_required')}`))
                 }
                 try {
                     const json = JSON.parse(value)
                     console.log('json', json)
 
-                    return typeof (json) == 'object' ? Promise.resolve() : Promise.reject(new Error(`数据格式不正确`))
+                    return typeof (json) == 'object' ? Promise.resolve() : Promise.reject(new Error(t('incorrect_format')))
                 } catch (e) {
-                    return Promise.reject(new Error(`数据格式不正确`))
+                    return Promise.reject(new Error(t('incorrect_format')))
                 }
             }
         }]} />
@@ -291,10 +301,12 @@ function FormItemRender({ input, disabled }: { input: any, disabled: boolean }) 
 }
 
 function FormItemRadioButton({ input, disabled, rules }: { input: any, disabled: boolean, rules?: any[] }) {
+    const t = useTranslations();
+
     return <Form.Item
         label={input.name || input.internalType}
         name={input.name}
-        rules={[{ required: true, message: '必须选一个值' }]}
+        rules={[{ required: true, message: t('require_a_value') }]}
         className="!mb-2"
     >
         <Radio.Group buttonStyle="solid" disabled={disabled}>
@@ -304,28 +316,32 @@ function FormItemRadioButton({ input, disabled, rules }: { input: any, disabled:
     </Form.Item>
 }
 function FormItemInput({ input, disabled, required, rules }: { input: any, disabled: boolean, required?: boolean, rules?: any[] }) {
-    const { name, type, internalType } = input
+    const t = useTranslations();
+
+    const { name, type } = input
     return <Form.Item
         label={name}
         name={name}
-        rules={rules || [{ required: true, message: `${input.name}不能为空` }]}
+        rules={rules || [{ required: true, message: `${input.name}${t('is_required')}` }]}
         required={required}
         className="!mb-2"
     >
         <Input
             key={name}
             name={name}
-            placeholder={type.startsWith('bytes') ? `${type}:16进制数字,以0x开头` : type}
+            placeholder={type.startsWith('bytes') ? `${type}:${t('start_0x')}` : type}
             allowClear
             disabled={disabled}
         />
     </Form.Item>
 }
 function FormItemArea({ input, disabled, rules }: { input: any, disabled: boolean, rules?: any[] }) {
+    const t = useTranslations();
+
     return <Form.Item
         label={input.name || input.internalType}
         name={input.name}
-        rules={rules || [{ required: true, message: '不能为空' }]}
+        rules={rules || [{ required: true, message: t('is_required') }]}
         className="!mb-2"
     >
         <Input.TextArea rows={4}

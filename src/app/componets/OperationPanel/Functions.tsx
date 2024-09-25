@@ -1,15 +1,19 @@
+
+import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Contract, FunctionItem } from "@/types";
 import { Empty, Select, Skeleton } from "antd";
-import { useEffect, useState } from "react";
 import Card from "../Layout/Card";
 import classes from "./functions.module.scss";
 import { defaultContract } from "@/constants";
 
 
 export default function Functions({ contract, select }: { contract: Contract | null, select: (functionItem: FunctionItem) => void }) {
-    const { abi = [], name = '', hash = '', address = '' } = contract || defaultContract;
+    const { abi, hash } = contract || defaultContract;
     const [currentFunction, setCurrentFunction] = useState<FunctionItem | null>(null)
     const [pageLoading, setPageLoading] = useState(true)
+    const t = useTranslations();
+
     const functions: any = abi.filter((item: any, index: number) => {
         item.rawIndex = index;
         if (item.name && item.type === 'function') {
@@ -28,12 +32,13 @@ export default function Functions({ contract, select }: { contract: Contract | n
         setCurrentFunction(functions[0])
         setPageLoading(false)
     }, [hash])
+
     return (
-        <Card title={`方法列表 [${functions.length || 0}]`} rootClassName="h-full overflow-hidden gap-4 flex flex-col shrink-0 min-w-64">
+        <Card title={`${t('function_list')} [${functions.length || 0}]`} rootClassName="h-full overflow-hidden gap-4 flex flex-col shrink-0 min-w-64">
             <Select
                 showSearch
                 style={{ width: '100%' }}
-                placeholder="搜索方法名"
+                placeholder={t('search_function_name')}
                 options={functions}
                 value={currentFunction?.value || null}
                 optionRender={(option) => {

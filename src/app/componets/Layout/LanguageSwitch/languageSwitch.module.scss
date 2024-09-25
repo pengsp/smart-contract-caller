@@ -1,0 +1,11 @@
+.lang {
+    @apply leading-7 h-7 my-2 w-24 bg-gray-200 px-2 text-stone-500 flex font-serif cursor-pointer;
+
+    &:hover {
+        @apply bg-blue-400 text-white;
+    }
+}
+
+.lang_current {
+    @apply leading-7 h-7 my-2 w-24 px-2 bg-blue-500 text-white flex justify-between font-serif;
+}

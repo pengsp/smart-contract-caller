@@ -49,8 +49,15 @@ export function useContractManager() {
     }, [localContracts])
 
     const deleteContract = useCallback((hash: string) => {
-        const _localContracts = localContracts?.filter(contract => contract.hash != hash) || []
-        setLocalContracts([..._localContracts])
+        const _localContracts: Contract[] = []
+        localContracts?.map(contract => {
+            if (contract.hash != hash) {
+                console.log(contract.hash, hash)
+                _localContracts.push(contract)
+            }
+        }) || []
+        setCurrentContractHash('')
+        setLocalContracts(_localContracts)
     }, [localContracts])
 
     const updateContract = useCallback((contract: Contract) => {

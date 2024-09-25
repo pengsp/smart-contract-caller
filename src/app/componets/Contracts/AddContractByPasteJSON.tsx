@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Alert, Button, Input } from "antd";
 import { useContractManager } from "@/hooks";
 
@@ -6,6 +7,7 @@ export default function AddContractByPasteJSON({ handleCancel, callback }: { han
     const [contracts, setContracts] = useState<string | undefined>()
     const [errMsg, setErrMsg] = useState<string>('')
     const { batchAddContract } = useContractManager()
+    const t = useTranslations();
 
     const handleChange = (e: any) => {
         const value = e.target.value;
@@ -18,7 +20,7 @@ export default function AddContractByPasteJSON({ handleCancel, callback }: { han
             try {
                 const json = JSON.parse(contracts)
                 if (typeof json != 'object') {
-                    setErrMsg('Incorrect format')
+                    setErrMsg(t('incorrect_format'))
                     return
                 }
                 const res = batchAddContract(json)
@@ -26,13 +28,13 @@ export default function AddContractByPasteJSON({ handleCancel, callback }: { han
                     if (res.count) {
                         callback(res.count)
                     } else {
-                        setErrMsg('没有找到符合规则的数据，请检查数据格式调整后重新提交')
+                        setErrMsg(t('no_data_matching_the_rule'))
                     }
                 } else {
-                    setErrMsg(res.msg || 'Incorrect format')
+                    setErrMsg(res.msg || t('incorrect_format'))
                 }
             } catch (e) {
-                setErrMsg('Incorrect format')
+                setErrMsg(t('incorrect_format'))
             }
 
         }
@@ -45,12 +47,12 @@ export default function AddContractByPasteJSON({ handleCancel, callback }: { han
 
     return (<div>
         <div className="h-[118px]">
-            <Input.TextArea rows={5} autoSize={{ minRows: 5, maxRows: 5 }} placeholder={`请输入符合规则的JSON数据`} allowClear onChange={handleChange} />
+            <Input.TextArea rows={5} autoSize={{ minRows: 5, maxRows: 5 }} placeholder={t('paste_abi_placeholder')} allowClear onChange={handleChange} />
         </div>
         {errMsg && <div className="mt-3">  <Alert message={errMsg} type="error" showIcon /></div>}
         <div className="flex justify-end mt-4 gap-6">
-            <Button onClick={handleCancel}>取消</Button>
-            <Button onClick={batchAdd} type="primary" disabled={!contracts}>提交</Button>
+            <Button onClick={handleCancel}>{t('cancel')}</Button>
+            <Button onClick={batchAdd} type="primary" disabled={!contracts}>{t('submit')}</Button>
         </div>
     </div>)
 }

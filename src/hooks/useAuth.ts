@@ -24,7 +24,6 @@ export function useAuth() {
 
   async function connect() {
     if (window.ethereum == null) {
-      console.log('请先安装metamask')
       return { error: "METAMASK_NOT_INSTALLED" }
     }
     const connection = getConnection();
@@ -54,7 +53,6 @@ export function useAuth() {
 
 async function connect() {
   const connection = getConnection();
-  console.log(connection)
   const { connector } = connection;
 
   // We intentionally omit setting a non-ok status on this trace, as it is expected to fail.

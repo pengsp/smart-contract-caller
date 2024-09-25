@@ -1,9 +1,10 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { isAddress } from "ethers";
 import { networks } from "@/configs";
-import { Button, Form, Input, message, Modal } from "antd";
+import { Button, Form, Input } from "antd";
 import NetworkItem from "../NetworkItem";
 import classes from "./contracts.module.scss"
 import { Contract, Network } from "@/types";
@@ -14,6 +15,7 @@ export default function ContractEditor({ contract, handleCancel, callback }: { c
     const [selectedChainids, setSelectedChainids] = useState<string[]>([])
     const [contractHash, setContractHash] = useState<string | undefined | null>()
     const { updateContract, addContract } = useContractManager()
+    const t = useTranslations();
 
     const initialValues = {
         name: '',
@@ -84,40 +86,39 @@ export default function ContractEditor({ contract, handleCancel, callback }: { c
             onFinish={onFinish}
         >
             <Form.Item
-                label="合约名称"
+                label={t('contract_name')}
                 name="name"
                 validateTrigger="onBlur"
-                rules={[{ required: true, message: '请输入合约名称!' }]}
+                rules={[{ required: true, message: `${t('contract_name')}${t('is_required')}` }]}
             >
-                <Input placeholder="合约名称" allowClear maxLength={50} showCount />
+                <Input placeholder={t('contract_name')} allowClear maxLength={50} showCount />
             </Form.Item>
 
             <Form.Item
-                label="合约地址"
+                label={t('contract_address')}
                 name="address"
                 required
                 validateTrigger="onBlur"
                 rules={[{
                     validator: (_, value) => {
                         if (!value) {
-                            return Promise.reject(new Error('请输入合约地址!'))
+                            return Promise.reject(new Error(`${t('contract_address')}${t('is_required')}`))
                         }
-                        return isAddress(value) ? Promise.resolve() : Promise.reject(new Error('无效的合约地址!'))
+                        return isAddress(value) ? Promise.resolve() : Promise.reject(new Error(`${t('invalid')}${t('contract_address')}`))
                     }
                 }]}
             >
-                <Input placeholder="合约地址" allowClear />
+                <Input placeholder={t('contract_address')} allowClear />
             </Form.Item>
 
 
             <Form.Item
-                label="合约部署的网络"
+                label={t('base_on')}
                 name="chains"
             >
                 <div>
                     <div className="mb-3 text-orange-400">
-                        <div>若选择了网络则合约调用的时候会判断网络是否匹配，若你添加的合约部署的网络不在下面的列表中不选即可。</div>
-                        <div>如果合约以同一个合约地址部署到多个网络上，那么你可以把对应的网络都选上。</div>
+                        <div>{t('base_on_tips')}</div>
                     </div>
                     <div className={classes.networks_wrap}>
                         {networks.map((network: Network) => {
@@ -136,37 +137,37 @@ export default function ContractEditor({ contract, handleCancel, callback }: { c
                 rules={[{
                     validator: (_, value) => {
                         if (!value) {
-                            return Promise.reject(new Error('请输入合约ABI!'))
+                            return Promise.reject(new Error(`ABI${t('is_required')}`))
                         }
                         try {
                             const abiJson = JSON.parse(value)
                             if (abiJson instanceof Array) {
                                 return Promise.resolve()
                             } else {
-                                return Promise.reject(new Error('ABI格式不正确，它应该是一个数组的形式!'))
+                                return Promise.reject(new Error(t('incorrect_format')))
                             }
                         } catch (e) {
-                            return Promise.reject(new Error('ABI格式不正确，它应该是一个数组的形式!'))
+                            return Promise.reject(new Error(t('incorrect_format')))
                         }
                     }
                 }]}
             >
-                <Input.TextArea rows={8} placeholder="合约的ABI，它应该是一个数组形式" allowClear />
+                <Input.TextArea rows={8} placeholder={t('abi_placeholder')} allowClear />
             </Form.Item>
             <Form.Item
-                label="备注"
+                label={t('remark')}
                 name="remark"
             >
-                <Input.TextArea rows={2} autoSize={{ minRows: 2, maxRows: 4 }} placeholder="备注" allowClear maxLength={200} showCount />
+                <Input.TextArea rows={2} autoSize={{ minRows: 2, maxRows: 4 }} placeholder={t('remark')} allowClear maxLength={200} showCount />
             </Form.Item>
             <div className="flex gap-5 justify-end">
-                <Button onClick={handleCancel}>取消</Button>
+                <Button onClick={handleCancel}>{t('cancel')}</Button>
 
-                <Button onClick={reset}>
-                    重置
+                <Button onClick={reset} >
+                    {t('reset')}
                 </Button>
                 <Button type="primary" htmlType="submit" >
-                    提交
+                    {t('submit')}
                 </Button>
             </div>
         </Form>

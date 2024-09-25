@@ -1,6 +1,10 @@
+import { useTranslations } from "next-intl";
+
 export default function JSONDataFormatTips() {
+    const t = useTranslations();
+
     return (<div className="mb-6">
-        <div className="mb-2">上传的数据应该是一个数组,数据结构参考如下</div>
+        <div className="mb-2">{t('data_structure_as')}</div>
         <div className="bg-gray-200 p-4 rounded">
             <div className="flex gap-1 ">{`[`}</div>
             <div className="ml-2 font-sans">{`{`}</div>
