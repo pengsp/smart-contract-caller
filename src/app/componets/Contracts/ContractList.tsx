@@ -4,12 +4,12 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Button, Dropdown, Select, Skeleton, Tag } from "antd";
 import { BlockOutlined, CloudUploadOutlined, FileTextOutlined, PlusOutlined } from "@ant-design/icons";
-import { Contract } from "@/types";
+import { Contract, ViaType } from "@/types";
 import { networks } from "@/configs";
 import { useContractManager } from "@/hooks";
 import type { MenuProps } from 'antd';
-import { ViaType } from "./ContractModal";
 import classes from "./contracts.module.scss"
+import AddContractBtn from "./AddContractBtn";
 
 export default function ContractList({ add }: { add: (via: ViaType) => void }) {
     const t = useTranslations();
@@ -92,47 +92,4 @@ function getChainByChainId(chainId: string) {
             </div>
         </Tag>
     }
-}
-
-export function AddContractBtn({ action }: { action: (via: ViaType) => void }) {
-    const t = useTranslations();
-
-    const handleMenuClick: MenuProps['onClick'] = (e) => {
-        const via = e.key as ViaType
-        action(via)
-    };
-
-    const items: MenuProps['items'] = [{
-        key: '1',
-        type: 'group',
-        label: t('select_via'),
-        children: [{
-            label: t('form_submission'),
-            key: 'form',
-            icon: <FileTextOutlined />,
-        },
-        {
-            label: t('upload_json'),
-            key: 'upload',
-            icon: <CloudUploadOutlined />,
-        },
-        {
-            label: t('paste_json'),
-            key: 'paste',
-            icon: <BlockOutlined />,
-        },]
-    }
-
-    ];
-
-    const menuProps = {
-        items,
-        onClick: handleMenuClick,
-    };
-
-    return (<>
-        <Dropdown menu={menuProps} placement="bottomRight" arrow>
-            <Button icon={<PlusOutlined />} type="primary"> {t('add_contract')}</Button>
-        </Dropdown>
-    </>)
 }

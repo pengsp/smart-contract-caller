@@ -14,7 +14,7 @@ import InfoItem from "./InfoItem"
 import Params from "./ParamsItem"
 import Card from "../Layout/Card"
 import { networks } from "@/configs"
-import NetworkSwitchBtn from "../Connection/NetworkSwitchBtn"
+import NetworkSwitchBtn from "../Networks/NetworkSwitchBtn/NetworkSwitchBtn"
 import { FunctionRender } from "./Logs"
 
 const { Text } = Typography;
@@ -184,7 +184,7 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                         {functionInfo?.stateMutability && <InfoItem name="State Mutability" value={functionInfo.stateMutability} />}
                         {functionInfo?.inputs.length > 0 && <Params type="inputs" params={functionInfo.inputs} />}
                         {functionInfo?.outputs.length > 0 && <Params type="outputs" params={functionInfo.outputs} />}
-                    </> : <div className="h-full flex flex-col justify-center"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>}
+                    </> : <div className="h-full flex flex-col justify-center"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('empty_tip')} /></div>}
                 </div>
                 <div className=" bg-gray-50 p-4 px-6 grow shrink-0 h-full overflow-auto box-border">
                     <Form
@@ -224,7 +224,7 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                                         </>
                                         : <ConnectWalletBtn danger type="primary" />}
                                 </div>
-                            </Form.Item> : <div className="h-full flex flex-col justify-center"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>}
+                            </Form.Item> : <div className="h-full flex flex-col justify-center"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('empty_tip')} /> </div>}
                     </Form>
                 </div>
             </div>

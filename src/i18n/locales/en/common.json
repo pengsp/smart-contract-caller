@@ -62,5 +62,12 @@
     "start_0x": "Must start with 0x",
     "start_0x_len_le_max": "Must start with 0x and length less than or equal to {maxLen}",
     "require_a_value": "You must select a value",
-    "checksum_failed": "checksum failed! Invalid address"
+    "checksum_failed": "checksum failed! Invalid address",
+    "custom_network_tips_1": "Don't have the network you need? Try ",
+    "custom_network": "Custom Network",
+    "empty_tip": "No Data",
+    "update_success": "Update Successfully",
+    "No_RPC_provided": "No RPC provided for {network}, You need to add the network in MetaMask and then switch the network.",
+    "network_switch_failed": "Network switch failed",
+    "network_select_placeholder": "Please select the network for contract deployment (Optional or Multiple )"
 }

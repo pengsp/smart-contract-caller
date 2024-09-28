@@ -57,7 +57,7 @@ export default function Functions({ contract, select }: { contract: Contract | n
                             <span className={classes.index}> {index + 1}:</span>{item.name}({item.inputs.length > 0 ? item.inputs.length : ''})
                         </div>
 
-                    }) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />)
+                    }) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('empty_tip')} />)
                 }
             </div>
         </Card>)

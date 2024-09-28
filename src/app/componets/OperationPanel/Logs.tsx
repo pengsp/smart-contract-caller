@@ -17,7 +17,7 @@ export default function Logs({ logs, clearLogs }: { logs: Log[], clearLogs: () =
         }
     }, [logsRef, logs.length])
 
-    return <Card title={<div>{t('logs')}<span className="text-xs text-orange-400 ml-2 font-mono" >{t('json_unsupported_bigint_tips')}</span></div>}
+    return <Card title={<div>{t('logs')}<span className="text-xs text-orange-400 ml-2 font-serif " >{t('json_unsupported_bigint_tips')}</span></div>}
         extra={<Button icon={<ClearOutlined />} onClick={clearLogs} size="small">{t('clear_logs')}</Button>}
         rootClassName="h-full flex flex-col" >
         <div className="py-4 text-xs whitespace-normal break-all h-full overflow-auto  box-border " ref={logsRef}>
@@ -31,7 +31,7 @@ export default function Logs({ logs, clearLogs }: { logs: Log[], clearLogs: () =
                 }
 
             })
-                : <div className="h-full flex flex-col justify-center"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /></div>
+                : <div className="h-full flex flex-col justify-center"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('empty_tip')} /> </div>
             }
         </div>
 

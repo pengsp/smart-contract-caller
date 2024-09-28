@@ -1,5 +1,5 @@
 "use client"
-import { lazy, useCallback, useEffect, useMemo, useState } from "react";
+import { lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Button, Descriptions, Empty, Modal, Popconfirm, Skeleton, Tooltip, Typography } from 'antd';
@@ -12,12 +12,17 @@ import { Contract } from "@/types";
 const LazyReactJson = lazy(() => import("react-json-view"))
 const { Paragraph } = Typography;
 
-export default function ContractInfo({ edit }: { edit: (contract: Contract) => void }) {
+export interface ContractModalRef {
+    show: (contract?: Contract) => void;
+}
+
+
+export default function ContractInfo({ action }: { action: (contrat: Contract) => void }) {
 
     const [pageLoading, setPageLoading] = useState(true)
     const { deleteContract, currentContract, setCurrentContractHash } = useContractManager()
-
     const [isModalOpen, setIsModalOpen] = useState(false);
+
     const t = useTranslations();
 
     const showABIModal = () => {
@@ -41,7 +46,7 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
 
     const actionEditContract = useCallback(() => {
         if (currentContract) {
-            edit(currentContract)
+            action(currentContract)
         }
     }, [currentContract]);
 
@@ -118,7 +123,7 @@ export default function ContractInfo({ edit }: { edit: (contract: Contract) => v
         />
         <Modal title={`${currentContract && currentContract.name} ABI`} open={isModalOpen} onOk={handleOk} width={720} onCancel={handleCancel} footer={null}>
             <div className="h-[50vh] overflow-auto">
-                {currentContract ? <LazyReactJson src={currentContract.abi} name={false} collapsed={2} /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+                {currentContract ? <LazyReactJson src={currentContract.abi} name={false} collapsed={2} /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('empty_tip')} />}
             </div>
             <div className="flex justify-end mt-5">
                 <Button type="primary" onClick={handleOk}>{t('confirm')}</Button>
@@ -132,18 +137,27 @@ function BlockExplorerLinks({ chainId, contractAddrss }: { chainId: string, cont
 
     const network = networks.find(network => network.chainId == chainId)
     if (network) {
-        return <Tooltip title={t('view_on_explorer', { chainName: network.chainName })}>
-            <a key={network.chainId}
-                className="flex justify-center border py-1 px-2 rounded gap-1 relative bg-gray-100  "
-                href={`${network.blockExplorerUrls[0]}address/${contractAddrss} `}
-                target="_blank"
-            >
+        if (network.blockExplorerUrls[0]) {
+            return <Tooltip title={t('view_on_explorer', { chainName: network.chainName })}>
+                <a key={network.chainId}
+                    className="flex justify-center border py-1  px-2 rounded gap-1 relative bg-gray-100 items-center "
+                    href={`${network.blockExplorerUrls[0]}/address/${contractAddrss} `}
+                    target="_blank"
+                >
+                    {network?.iconUrls && network?.iconUrls?.length > 0
+                        ? <Image src={network.iconUrls[0]} width={16} height={16} alt={`${network.chainName}`} style={{ maxHeight: "16px" }} />
+                        : <Image src="/images/chains/none.svg" width={16} height={16} alt={`${network.chainName}`} />}
+                    <span className="text-xs">{network.chainName}</span>
+                </a>
+            </Tooltip>
+        } else {
+            return <div className="flex justify-center border py-1  px-2 rounded gap-1 relative bg-gray-100 items-center ">
                 {network?.iconUrls && network?.iconUrls?.length > 0
-                    ? <Image src={network.iconUrls[0]} width={16} height={16} alt={`${network.chainName}`} />
-                    : <Image src="/images/other.svg" width={16} height={16} alt={`${network.chainName}`} />}
+                    ? <Image src={network.iconUrls[0]} width={16} height={16} alt={`${network.chainName}`} style={{ maxHeight: "16px" }} />
+                    : <Image src="/images/chains/none.svg" width={16} height={16} alt={`${network.chainName}`} />}
                 <span className="text-xs">{network.chainName}</span>
-            </a>
-        </Tooltip>
+            </div>
+        }
     } else {
         return null
     }

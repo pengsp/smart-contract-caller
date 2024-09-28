@@ -26,7 +26,7 @@ export default async function RootLayout({
   return (
     <html lang={lang} dir={direction}>
       <body >
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider messages={messages} locale={lang}>
           <Web3Provider>
             <AntdRegistry>
               {children}

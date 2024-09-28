@@ -8,5 +8,6 @@ export interface Network {
     },
     rpcUrls: string[],
     blockExplorerUrls: string[],
-    iconUrls?: string[]
+    iconUrls?: string[],
+    [propName: string]: any
 }

@@ -52,7 +52,6 @@ export function useContractManager() {
         const _localContracts: Contract[] = []
         localContracts?.map(contract => {
             if (contract.hash != hash) {
-                console.log(contract.hash, hash)
                 _localContracts.push(contract)
             }
         }) || []
@@ -91,7 +90,7 @@ export function useContractManager() {
                         _initContracts.push({ name, address, hash, chainIds, abi, timestamp, remark })
                     }
                 })
-                if (_initContracts && _initContracts.length > 0) {
+                if (_initContracts.length > 0) {
                     setLocalContracts(localContracts ? [..._initContracts, ...localContracts] : _initContracts)
                     setCurrentContractHash(_initContracts[0].hash)
                     count = _initContracts.length
