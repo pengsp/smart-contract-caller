@@ -69,5 +69,7 @@
     "update_success": "Update Successfully",
     "No_RPC_provided": "No RPC provided for {network}, You need to add the network in MetaMask and then switch the network.",
     "network_switch_failed": "Network switch failed",
-    "network_select_placeholder": "Please select the network for contract deployment (Optional or Multiple )"
+    "network_select_placeholder": "Please select the network for contract deployment (Optional or Multiple )",
+    "unit_converter": "Unit Converter",
+    "converter_placeholder": "input number"
 }

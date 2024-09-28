@@ -70,5 +70,7 @@
     "No_RPC_provided": "没有找到 {network} 的RPC, 请自行去MetaMask添加网络，然后再进行网络切换。",
     "warning": "重要提醒",
     "network_switch_failed": "网络切换失败",
-    "network_select_placeholder": "请选择合约部署的网络 (可选项，可多选 )"
+    "network_select_placeholder": "请选择合约部署的网络 (可选项，可多选 )",
+    "unit_converter": "单位换算工具",
+    "converter_placeholder": "输入数字"
 }

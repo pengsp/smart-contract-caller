@@ -36,12 +36,12 @@ export default function Connection() {
 
     return (<>
         {isLogin ?
-            <div className="flex items-center gap-4">
+            <>
                 <Networks />
                 <Dropdown menu={{ items }} placement="bottomRight" arrow>
                     <Button type="primary" icon={<DownOutlined />} iconPosition="end">{truncateAddress(account)}</Button>
                 </Dropdown>
-            </div>
+            </>
             : <ConnectWalletBtn />}
     </>)
 }

@@ -18,7 +18,7 @@ export default function Logs({ logs, clearLogs }: { logs: Log[], clearLogs: () =
     }, [logsRef, logs.length])
 
     return <Card title={<div>{t('logs')}<span className="text-xs text-orange-400 ml-2 font-serif " >{t('json_unsupported_bigint_tips')}</span></div>}
-        extra={<Button icon={<ClearOutlined />} onClick={clearLogs} size="small">{t('clear_logs')}</Button>}
+        extra={<Button icon={<ClearOutlined />} onClick={clearLogs} size="small" variant="filled" color="primary">{t('clear_logs')}</Button>}
         rootClassName="h-full flex flex-col" >
         <div className="py-4 text-xs whitespace-normal break-all h-full overflow-auto  box-border " ref={logsRef}>
             {(logs && logs.length > 0) ? logs.map((log: Log, index: number) => {

@@ -20,10 +20,9 @@ export default function Nav() {
                         <p className="text-gray-400 ">{t('slogan')}</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-5">
+                <div className="flex items-center gap-4">
                     <Connection />
                     <LanguageSwitch />
-
                     <a href="https://github.com/pengsp/smart-contract-caller" target="_blank" title="Github">
                         <GithubOutlined className="text-2xl hover:scale-105 " />
                     </a>
