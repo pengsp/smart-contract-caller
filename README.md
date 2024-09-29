@@ -8,9 +8,14 @@
 
 预览地址：[https://smart-contract-caller.vercel.app/](https://smart-contract-caller.vercel.app/)
 
+
 ## 背景
  
 智能合约部署到区块链上，如果合约不做验证是无法通过区块浏览器进行合约调用，而基于某些原因，开发阶段一般不会进行合约验证操作，这就大大增加了前端和测试人员观察或更改合约里数据的难度。
+
+## 操作展示
+<img src="./docs/images/demo-en.gif" alt="工具界面截图" width="100%" height="auto">
+
 
 ## 特性
 
@@ -20,81 +25,38 @@
 合约所有的方法将以列表的形式展现出来，选择任意方法可查看方法的`类型`、`输入参数`、`输出参数`等数据，同时提供执行方法的入口。
 3. 日志清晰  
 合约操作的日志都会按照时间线在界面上展示，包括操作的方法、返回的数据、txHash、Event、Error等数据   
+4. 支持多种区块链网络   
+内置市面上能搜集到的EVM区块链网络1888个,包括测试网。
+5. 支持国际化   
+内置英语和简体中文，可自行增加语言包来支持其他语言
 
 更多细节，请自行体验。
 
 
-## 界面截图
-<img src="./docs/images/screenshot.png" alt="工具界面截图" width="100%" height="auto">
+## 部署
 
+支持docker部署和自行编译代码部署
 
-## 开发
+### Docker部署
 
-相关命令根据你的包管理工具自行替换
-
-### 安装依赖 
+#### 拉取镜像
 ```bash
-yarn install
+docker pull pengsp/smart-contract-caller:latest
 ```
-### 开发模式
-
-```bash
-yarn dev
-```
-
-### 编译
-```
-yarn build
-```
-### 运行
-```
-yarn start
-```
-默认开启了Next.js的`standalone`模式，参考文档：[Automatically Copying Traced Files](https://nextjs.org/docs/pages/api-reference/next-config-js/output#automatically-copying-traced-files)
-
-## Docker部署
-
-### 编译
-```bash
-docker build -t smart-contract-caller .
-```
-
-### 运行
+#### 运行   
+docker运行参数可根据实际需要进行调整
 
 ```bash
 docker run -d -p 3000:3000 smart-contract-caller
 ```
+#### 访问
+访问 http://localhost:3000
 
-### 配置支持的网络
-支持的网络列表配置在文件`/src/configs/networks.ts`   
-参数类型(EIP-3085)
-```js
-interface Network {
-    chainId: string, // A 0x-prefixed hexadecimal chainId
-    chainName: string,
-    nativeCurrency: {
-        name: string,
-        symbol: string,
-        decimals: number
-    },
-    rpcUrls: string[],
-    blockExplorerUrls: string[],
-    iconUrls?: string[]
-}
-```
+### 自行编译代码部署
 
-### 初始化测试合约配置
-项目`public`目录内有一个`init-contract.json`文件，此文件合约ABI包含ERC20标准的方法以及一些接收各种类型数据的方法，用于测试工具对数据的校验和解析是否正确,可根据需要修改为自己的合约   
-参数类型如下
-```js
-interface BaseContract {
-    name: string, // 合约的备注名称
-    address: string,//合约地址
-    chainIds: string[],// 
-    abi: Record<string, any>[],//合约的ABI，它应该是一个数组
-    remark:string
-}
-```
+自行编译代码部署，如果有需要增加语言包、设置设置默认演示合约等需求，请查看
+[开发文档](/docs/development.md)   
+
 
 
 ### 数据存储说明
