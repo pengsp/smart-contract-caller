@@ -34,7 +34,7 @@
     </style>
   </defs>
   <circle
-     style="fill:#ffffff;fill-opacity:1;stroke-width:2;stroke-linecap:square;stroke-miterlimit:3.2;paint-order:markers fill stroke"
+     style="fill:#ffffff;fill-opacity:1;stroke-width:2;strokeLinecap:square;stroke-miterlimit:3.2;paint-order:markers fill stroke"
      id="path3004"
      cx="64"
      cy="64"
