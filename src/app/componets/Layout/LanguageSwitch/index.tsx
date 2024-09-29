@@ -1,5 +1,5 @@
 
-import { startTransition } from "react";
+import { startTransition, useState } from "react";
 import { useLocale } from "next-intl";
 import { Button, Popover } from "antd";
 import { setUserLocale } from "@/i18n/service";
@@ -9,6 +9,7 @@ import { langsMap } from "@/i18n/config"
 import { IconTranslate } from "../../Icons";
 
 export default function LanguageSwitch() {
+    const [open, setOpen] = useState(false);
 
     const lang = useLocale();
 
@@ -21,12 +22,16 @@ export default function LanguageSwitch() {
 
     const switchLang = (lang: string) => {
         startTransition(() => {
+            setOpen(false);
             setUserLocale(lang);
         });
     }
+    const handleOpenChange = (newOpen: boolean) => {
+        setOpen(newOpen);
+    };
     return (<>
-        <Popover placement="bottomRight" content={topLangsDom} trigger="click" >
-            <div className="cursor-pointer  rounded p-1 px-2 bg-gray-100 hover:bg-gray-200 ">
+        <Popover placement="bottomRight" content={topLangsDom} trigger="click" open={open} onOpenChange={handleOpenChange}>
+            <div className="cursor-pointer  rounded p-1 px-2  ">
                 <IconTranslate className="stroke-1" />
             </div>
         </Popover>
