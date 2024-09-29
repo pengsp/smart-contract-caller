@@ -1,0 +1,22 @@
+.form_root {
+    .base_on_type {
+        @apply border relative p-2 px-3 items-center rounded cursor-pointer bg-white basis-1/2 flex gap-4 justify-between;
+
+        &:hover {
+            @apply border-blue-400;
+        }
+    }
+
+    .base_on_type_selected {
+        @extend .base_on_type;
+        @apply border-blue-400 bg-blue-100;
+
+        &:hover {
+            @apply border-blue-400 bg-blue-100;
+        }
+    }
+
+    .check_icon {
+        @apply text-xl;
+    }
+}

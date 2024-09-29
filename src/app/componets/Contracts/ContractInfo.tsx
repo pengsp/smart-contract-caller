@@ -56,9 +56,9 @@ export default function ContractInfo({ action }: { action: (contrat: Contract) =
                 return <BlockExplorerLinks chainId={chainId} contractAddrss={currentContract.address} key={chainId} />
             })
         } else {
-            return null
+            return t('unspecified')
         }
-    }, [currentContract])
+    }, [currentContract, t])
 
     const contractItems = useMemo(() => {
         const { abi, name, hash, address, timestamp, remark } = currentContract || defaultContract;
