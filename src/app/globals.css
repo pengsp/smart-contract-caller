@@ -8,17 +8,14 @@
   --base-blue:#419fd9;
   --base-blue-50:#419fd9d1;
 }
-/* 自定义滚动条轨道 */
 ::-webkit-scrollbar-track {
   background-color: #f1f1f1;
 }
  
-/* 自定义滚动条的滑块 */
 ::-webkit-scrollbar-thumb {
   background-color: #8888883c;
 }
  
-/* 设置滚动条的宽度 */
 ::-webkit-scrollbar {
   width: 10px;
 }

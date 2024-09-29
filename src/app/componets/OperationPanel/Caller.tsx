@@ -190,7 +190,7 @@ export default function Caller({ contract, functionInfo, updateLogs }: {
                 <Button size="small" icon={<CodeOutlined />} variant="filled" color={open ? "primary" : "default"} onClick={toggleDrawer}>{t('unit_converter')}</Button>
             </div>}
         >
-            <div className="h-full relative">
+            <div className="h-[calc(100%-45px)] relative">
                 <div className="flex gap-4 h-full overflow-hidden font-mono  box-border pt-4 relative">
                     <div className="bg-gray-50 p-4 px-6 flex flex-col  h-full box-border min-w-64 shrink-0  overflow-auto ">
                         {functionInfo ? <>

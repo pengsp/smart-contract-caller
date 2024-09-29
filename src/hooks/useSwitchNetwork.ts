@@ -39,7 +39,6 @@ export function useSwitchNetwork() {
             notification.error({
                 message: 'No provider found',
                 description: 'Install MetaMask please!',
-
             });
         }
 
