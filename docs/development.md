@@ -1,57 +1,87 @@
 
-(文档以yarn为例，如果使用其他包管理方式，请自行替换命令)
+## Development Documentation
 
-#### 克隆代码
+This document uses `yarn` as an example. If you use other package management tools, please replace the commands accordingly.
+
+The project is built using Next.js (app router), you can visit [Next.js documentation](https://nextjs.org/docs) for more information.
+
+
+### Getting Started
+
+Clone code
 ```bash
 git clone git@github.com:pengsp/smart-contract-caller.git
 ```
 
-#### 安装依赖 
+install dependencies 
 ```bash
 yarn install
 ```
-#### 开发模式启动服务
+run the development server
 
 ```bash
 yarn dev
 ```
 
-#### 编译
-默认开启了Next.js的`standalone`模式，可根据自己部署的环境选择是否开启`standalone`   
-`standalone`模式参考文档：[Automatically Copying Traced Files](https://nextjs.org/docs/pages/api-reference/next-config-js/output#automatically-copying-traced-files)，
-```
+build   
+```bash
 yarn build
 ```
-#### 部署代码到自己的服务器
-1. 未开启`standalone`   
-代码编译完成之后，复制以下目录或文件到你的web server目录
+#### Deploy the code to your own server
+Once the code has been compiled, please copy the following directories or files to your web server's directory.
+
 ```
 smart-contract-caller
   |__ .next  
-  |   |__ static
   |__ node_modules  
+  |__ public
   |__ package.json
 
 ```
-然后在web server目录启动服务
+Then start the service in the web server directory
 ```bash
-nohup yarn start &
-# 请根据自己的进程管理方式调整启动服务的方式
+ yarn start 
 ```
-2. 开启`standalone` 
+Usually we use some process management tools to start the service. Please tailor the service startup command to your specific scenario.
 
 
+>If next.js standalone mode is enabled, please refer to the next.js related documents for configuration：[Automatically Copying Traced Files](https://nextjs.org/docs/pages/api-reference/next-config-js/output#automatically-copying-traced-files)，
 
-### 自行编译Docker镜像
 
+#### Compile your own Docker image
+If you want to build your own docker image, execute the following command  
 ```bash
 docker build -t smart-contract-caller .
+```   
+
+
+---
+### Other Configuration
+
+### i18n Configuration
+
+The language package is located in the `/src/i18n/locales` directory, and as for the configuration of the language switching menu, it resides in `/src/i18n/config.ts`.
+
+
+### Configure the initialization test contract
+There is an `init-contract.json` file in the project's `public` directory. The contract ABI of this file contains the ERC20 standard methods and some methods for receiving various types of data. It is used to test whether the tool verifies and parses the data correctly. You can modify it to your own contract as needed.
+
+Data structure interface
+```js
+interface BaseContract {
+    name: string, 
+    address: string,
+    chainIds: string[],
+    abi: Record<string, any>[],
+    remark:string
+}
 ```
 
+### Configure supported networks
+The list of supported networks is configured in the file `/src/configs/networks.json`. It includes various mainnets and testnets, totaling 1888 networks.   
+The parameters of each network must follow the EIP-3085 standard.
 
-### 配置支持的网络
-支持的网络列表配置在文件`/src/configs/networks.ts`   
-参数类型(EIP-3085)
+Data structure interface
 ```js
 interface Network {
     chainId: string, // A 0x-prefixed hexadecimal chainId
@@ -67,15 +97,3 @@ interface Network {
 }
 ```
 
-### 初始化测试合约配置
-项目`public`目录内有一个`init-contract.json`文件，此文件合约ABI包含ERC20标准的方法以及一些接收各种类型数据的方法，用于测试工具对数据的校验和解析是否正确,可根据需要修改为自己的合约   
-参数类型如下
-```js
-interface BaseContract {
-    name: string, // 合约的备注名称
-    address: string,//合约地址
-    chainIds: string[],// 
-    abi: Record<string, any>[],//合约的ABI，它应该是一个数组
-    remark:string
-}
-```

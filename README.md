@@ -2,65 +2,69 @@
 
 # Smart Contract Caller
 
-此项目用于提高智能合约联调、测试效率。  
-无需编写代码，无需合约验证，轻松调用智能合约的所有方法！   
+English docs | [中文文档](/README-zh-CN.md)
+
+When a smart contract is deployed on the blockchain, it is impossible to call the contract through the block browser if the contract is not verified. For some reasons, contract verification operations are generally not performed during the development phase, which greatly increases the difficulty for front-end developers and testers to observe or change the data in the contract.
+
+Using this tool, there is **no need to write code**, **no need to verify the contract**, and you can easily call all functions of the smart contract!   
+This greatly improves the efficiency of joint debugging and testing.
+
+## Preview
+
+Online Preview: [https://smart-contract-caller.vercel.app/](https://smart-contract-caller.vercel.app/)
+
+####
+<img src="./docs/images/demo-en.gif" alt="Operation demonstration" width="100%" height="auto">
 
 
-预览地址：[https://smart-contract-caller.vercel.app/](https://smart-contract-caller.vercel.app/)
+## Features
+
+-  **Easy to configure**  
+This tool only requires entering the contract's ABI, address, deployment network, and other relevant information to enable contract calls.    
+It supports three ways to add contract data: form submission, JSON file upload, and pasting JSON data.
+
+- **Simple operation, easy to use**   
+All contract functions are displayed in a list format. Simply select any function to view its type, input parameters, output parameters, and other relevant data. Additionally, an entry point is provided for executing the function.
+
+- **Detailed logging**  
+Contract operation logs are displayed on the interface chronologically, including function name, returned data, txHash, Events, Errors, and other relevant information. 
+
+- **Support internationalization**   
+Built-in support for English and Simplified Chinese. You can add language packs to support other languages as needed.
+
+For more details, please try it out for yourself.
 
 
-## 背景
- 
-智能合约部署到区块链上，如果合约不做验证是无法通过区块浏览器进行合约调用，而基于某些原因，开发阶段一般不会进行合约验证操作，这就大大增加了前端和测试人员观察或更改合约里数据的难度。
 
-## 操作展示
-<img src="./docs/images/demo-en.gif" alt="工具界面截图" width="100%" height="auto">
+## Deploy
 
+Support docker deployment and self-compiled code deployment
 
-## 特性
+### Docker deployment
 
-1.  配置简单  
-此工具只需要录入`合约的ABI`、`合约地址`、`合约部署的网络`以及一个合约备注名称即可开启合约调用。
-2. 操作简洁   
-合约所有的方法将以列表的形式展现出来，选择任意方法可查看方法的`类型`、`输入参数`、`输出参数`等数据，同时提供执行方法的入口。
-3. 日志清晰  
-合约操作的日志都会按照时间线在界面上展示，包括操作的方法、返回的数据、txHash、Event、Error等数据   
-4. 支持多种区块链网络   
-内置市面上能搜集到的EVM区块链网络1888个,包括测试网。
-5. 支持国际化   
-内置英语和简体中文，可自行增加语言包来支持其他语言
-
-更多细节，请自行体验。
-
-
-## 部署
-
-支持docker部署和自行编译代码部署
-
-### Docker部署
-
-#### 拉取镜像
+#### pull image
 ```bash
 docker pull pengsp/smart-contract-caller:latest
 ```
-#### 运行   
-docker运行参数可根据实际需要进行调整
+#### run container   
+Docker running parameters can be adjusted according to actual needs
 
 ```bash
 docker run -d -p 3000:3000 smart-contract-caller
 ```
-#### 访问
-访问 http://localhost:3000
 
-### 自行编译代码部署
+Open http://localhost:3000 with your browser to see the result.
 
-自行编译代码部署，如果有需要增加语言包、设置设置默认演示合约等需求，请查看
-[开发文档](/docs/development.md)   
+### Self-compiled code deployment
+
+If you need to add language packs, set default demonstration contracts, etc., you can compile and deploy them yourself. For details, please see
+[deployment docs](/docs/development.md)   
 
 
 
-### 数据存储说明
-- 合约信息存储在浏览器的`localStorage`里，页面刷新不会丢失
-- 日志信息存在内存中，刷新页面会丢失
+### Tips
 
+#### Data storage instructions
+- Contract information is stored in `localStorage` of the browser and will not be lost when the page is refreshed
+- Logs is stored in memory and will be lost when refreshing the page.
 
